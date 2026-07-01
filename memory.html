@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aidil Azani – Memory</title>
+    <meta name="description" content="Captured moments — photography by Aidil Azani.">
+    <script>
+        (function () {
+            var t; try { t = localStorage.getItem('theme'); } catch (e) { }
+            document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+        })();
+    </script>
+    <link rel="stylesheet" href="css/portfolio.css">
+    <link rel="stylesheet" href="css/memory.css">
+</head>
+
+<body>
+
+    <header class="site-nav">
+        <nav class="glass-nav" aria-label="Main navigation">
+            <a href="index.html" class="nav-logo">aidil<span>.</span></a>
+            <ul class="nav-links">
+                <li class="nav-indicator" aria-hidden="true"></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="work.html">Work</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="memory.html">Memory</a></li>
+            </ul>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark / light mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main class="memory-layout">
+        <div class="memory-header">
+            <span class="eyebrow">Memory</span>
+            <h1>Captured moments.</h1>
+            <p>Through eyes we see, through mind we remember.</p>
+        </div>
+
+        <div id="memory-grid" class="memory-grid">
+            <!-- Cards will be injected by JS -->
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 Aidil Azani. All rights reserved.
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/memory.js"></script>
+</body>
+
+</html>

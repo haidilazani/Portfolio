@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aidil Azani – Blog</title>
+    <meta name="description" content="Writing by Aidil Azani — stories, notes and lessons learned.">
+    <script>
+        (function () {
+            var t; try { t = localStorage.getItem('theme'); } catch (e) { }
+            document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+        })();
+    </script>
+    <link rel="stylesheet" href="css/portfolio.css">
+</head>
+
+<body>
+
+    <header class="site-nav">
+        <nav class="glass-nav" aria-label="Main navigation">
+            <a href="index.html" class="nav-logo">aidil<span>.</span></a>
+            <ul class="nav-links">
+                <li class="nav-indicator" aria-hidden="true"></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="work.html">Work</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="memory.html">Memory</a></li>
+            </ul>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark / light mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="container">
+            <div class="section-head centered reveal">
+                <span class="eyebrow">Blog</span>
+                <h1 class="section-title">Stories were written.</h1>
+                <p class="section-subtitle">…to be told of a person's intention. Notes from the path — code,
+                    design and the search in between.</p>
+            </div>
+
+            <div class="blog-list">
+                <a href="#" class="blog-entry reveal">
+                    <span class="date">Jun 2026</span>
+                    <div>
+                        <h3>Building this portfolio with only HTML, CSS &amp; JS</h3>
+                        <p>Why I skipped the frameworks, what liquid glass really takes, and what GitHub Pages
+                            taught me about keeping things simple.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+
+                <a href="#" class="blog-entry reveal reveal-delay-1">
+                    <span class="date">May 2026</span>
+                    <div>
+                        <h3>What a year of client work taught a CS student</h3>
+                        <p>Classroom code and shipped code are different animals. Lessons from my time at
+                            JustSimple that no lecture covered.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+
+                <a href="#" class="blog-entry reveal reveal-delay-2">
+                    <span class="date">Apr 2026</span>
+                    <div>
+                        <h3>Photography made me a better designer</h3>
+                        <p>Framing, light and patience — how chasing moments with a camera changed the way I lay
+                            out a page.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+
+                <a href="#" class="blog-entry reveal reveal-delay-3">
+                    <span class="date">Soon</span>
+                    <div>
+                        <h3>A remembrance of who I was</h3>
+                        <p>The story behind the words on my home page. Still being written — like its author.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 Aidil Azani. All rights reserved.
+    </footer>
+
+    <script src="js/navbar.js"></script>
+</body>
+
+</html>

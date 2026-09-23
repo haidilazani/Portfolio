@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Writing - Aidil Azani</title>
+    <title>Photography - Aidil Azani</title>
     <meta name="description"
-        content="Six posts I am writing: marching squares on a 2D canvas, building a portfolio with no framework, sentence embeddings for travel search, and what client work teaches a CS student.">
+        content="Concerts, architecture and the people I was with. Photographs taken between 2023 and 2026 by Aidil Azani, in Malaysia.">
 
     <!-- Seed theme + motion before first paint so neither flashes. -->
     <script>
@@ -32,17 +32,15 @@
 
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/stack.css">
-    <link rel="stylesheet" href="css/tilt.css">
 
-    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/blog.html">
+    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/photography.html">
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Aidil Azani">
-    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/blog.html">
-    <meta property="og:title" content="Writing - Aidil Azani">
+    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/photography.html">
+    <meta property="og:title" content="Photography - Aidil Azani">
     <meta property="og:description"
-        content="The six posts I am writing, and why. Nothing is published yet, so nothing here is a link.">
+        content="Concerts, architecture and the people I was with. Photographs taken between 2023 and 2026.">
     <meta property="og:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
     <meta property="og:image:width" content="800">
     <meta property="og:image:height" content="800">
@@ -50,9 +48,9 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@aidilazani">
     <meta name="twitter:creator" content="@aidilazani">
-    <meta name="twitter:title" content="Writing - Aidil Azani">
+    <meta name="twitter:title" content="Photography - Aidil Azani">
     <meta name="twitter:description"
-        content="The six posts I am writing, and why. Nothing is published yet, so nothing here is a link.">
+        content="Concerts, architecture and the people I was with. Photographs taken between 2023 and 2026.">
     <meta name="twitter:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
 
     <script type="application/ld+json">
@@ -78,8 +76,8 @@
                 <li class="nav-indicator" aria-hidden="true"></li>
                 <li><a href="work.html">Work</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="blog.html" aria-current="page">Writing</a></li>
-                <li><a href="photography.html">Photography</a></li>
+                <li><a href="blog.html">Writing</a></li>
+                <li><a href="photography.html" aria-current="page">Photography</a></li>
             </ul>
             <div class="nav-actions">
                 <button class="cmdk-trigger" type="button" data-cmdk-open>Search <kbd>&#8984;K</kbd></button>
@@ -105,93 +103,52 @@
 
     <main id="main">
 
-        <!-- ================================================================
-             Writing.
-             Every entry here is still unwritten, so
-             every entry renders as an <article>, never an <a>. No dead links.
-             ================================================================ -->
         <section class="section">
             <div class="container">
 
                 <div class="section-head" data-reveal style="--reveal-i: 0">
-                    <h1 class="section-title">What I'm <em class="accent-word">writing.</em></h1>
-                    <p class="section-sub">Six posts in the queue and none of them published yet, so none of them is
-                        a link. This is the order I plan to write them in; when one ships, its title becomes
-                        clickable and this line changes.</p>
+                    <h1 class="section-title">Through eyes we see, <em class="accent-word">through mind we
+                            remember.</em></h1>
+                    <p class="section-sub">Concerts, architecture, and the people I happened to be standing next to,
+                        photographed between 2023 and 2026. Open any one of them for the full frame.</p>
                 </div>
 
-                <div class="post-list">
+                <!--
+                  js/photos.js exposes window.PHOTOS; js/app.js builds .photo-card
+                  entries into this grid and wires them to the lightbox below.
+                  The noscript block underneath renders instead when JS is off.
+                -->
+                <div class="photo-grid" data-photo-grid></div>
 
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 1">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">Drawing an interactive topographic map in vanilla JS</h2>
-                        <p class="post-blurb">The background of this site is not an image and not a library. It's
-                            two value-noise fields cross-faded to make terrain breathe, traced into nine contour
-                            lines every frame with marching squares, with the cursor added as a Gaussian hill so the
-                            rings bulge around your pointer. Here's the whole algorithm, case by case, and why touch
-                            devices and reduced-motion users get one static render instead.</p>
-                    </article>
+                <noscript>
+                    <div class="photo-grid">
+                        <figure class="photo-card">
+                            <img src="images/optimized/petronas-towers-800.jpg"
+                                alt="The Petronas Twin Towers in Kuala Lumpur, shot straight up from the base at dusk"
+                                width="800" height="1066" loading="lazy" decoding="async">
+                            <figcaption class="photo-caption">Kuala Lumpur, 2025. Straight up from the base of the towers.</figcaption>
+                        </figure>
+                        <figure class="photo-card">
+                            <img src="images/optimized/mount-jerai-sky-800.jpg"
+                                alt="Cloud layers over the ridgeline seen from the summit of Mount Jerai"
+                                width="800" height="1066" loading="lazy" decoding="async">
+                            <figcaption class="photo-caption">Mount Jerai, 2024. Far enough from the city to see this.</figcaption>
+                        </figure>
+                        <figure class="photo-card">
+                            <img src="images/optimized/merdeka-118-800.jpg"
+                                alt="Merdeka 118 rising above the shophouses of the Kuala Lumpur skyline"
+                                width="800" height="1422" loading="lazy" decoding="async">
+                            <figcaption class="photo-caption">Merdeka 118, 2024. Seen over the shophouses below it.</figcaption>
+                        </figure>
+                        <figure class="photo-card">
+                            <img src="images/optimized/baskara-on-the-mic-800.jpg"
+                                alt="Baskara singing into a microphone under stage lights at a live show"
+                                width="800" height="1366" loading="lazy" decoding="async">
+                            <figcaption class="photo-caption">Baskara on the mic, 2023.</figcaption>
+                        </figure>
+                    </div>
+                </noscript>
 
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 2">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">Building this portfolio with only HTML, CSS &amp; JS</h2>
-                        <p class="post-blurb">Six pages, 103 KB gzipped, no framework and no build step. Why I skipped
-                            the frameworks, what liquid glass actually costs in CSS, and what GitHub Pages taught me
-                            about keeping things simple.</p>
-                    </article>
-
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 1">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">Teaching a search box what &#8220;quiet mountain ruins&#8221; means
-                        </h2>
-                        <p class="post-blurb">My final-year project ranks 1,155 UNESCO World Heritage sites by
-                            meaning instead of keywords. Notes on sentence embeddings, on why the category ontology
-                            mattered more than the model, and on spreading activation as a way to walk a graph of
-                            concepts.</p>
-                    </article>
-
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 2">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">What a year of client work taught a CS student</h2>
-                        <p class="post-blurb">Classroom code and shipped code are different animals. Lessons from my
-                            time at JustSimple that no lecture covered: page builders, client revisions, and the CSS
-                            you write when the theme fights you.</p>
-                    </article>
-
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 3">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">Photography made me a better designer</h2>
-                        <p class="post-blurb">Framing, light and patience: how chasing moments with a camera changed
-                            the way I lay out a page.</p>
-                    </article>
-
-                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 3">
-                        <p class="post-status">Planned</p>
-                        <h2 class="post-title">A remembrance of who I was</h2>
-                        <p class="post-blurb">The story behind the words on my home page. Still being written, like
-                            its author.</p>
-                    </article>
-
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================================================================
-             CTA
-             ================================================================ -->
-        <section class="section">
-            <div class="container">
-                <div class="section-head" data-reveal style="--reveal-i: 0">
-                    <h2 class="section-title">Want one of these <em class="accent-word">sooner?</em></h2>
-                    <p class="section-sub">Tell me which and I'll write that one first. Until then, the code every
-                        one of these posts describes is already readable on GitHub.</p>
-                    <p class="section-foot">
-                        <a class="btn btn-primary" href="index.html#contact" data-magnetic>Get in touch</a>
-                        <a class="btn btn-outline" href="https://github.com/haidilazani" target="_blank"
-                            rel="noopener">Browse the code</a>
-                    </p>
-                </div>
             </div>
         </section>
 
@@ -211,6 +168,32 @@
                 dependencies, no build step.</p>
         </div>
     </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+        <button class="lightbox-close" type="button" aria-label="Close photo viewer">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+        </button>
+        <button class="lightbox-prev" type="button" aria-label="Previous photo">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M15 5l-7 7 7 7" />
+            </svg>
+        </button>
+        <img class="lightbox-img"
+            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" width="1600"
+            height="1067">
+        <button class="lightbox-next" type="button" aria-label="Next photo">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+        <p class="lightbox-meta" aria-live="polite"></p>
+    </div>
 
     <!-- Command palette -->
     <div class="cmdk" data-cmdk hidden>
@@ -235,9 +218,8 @@
         </div>
     </div>
 
+    <script src="js/photos.js" defer></script>
     <script src="js/app.js" defer></script>
-    <script src="js/stack.js" defer></script>
-    <script src="js/tilt.js" defer></script>
 </body>
 
 </html>

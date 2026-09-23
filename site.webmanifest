@@ -1,0 +1,18 @@
+{
+  "name": "Aidil Azani — Frontend developer",
+  "short_name": "aidil.",
+  "description": "Portfolio of Aidil Azani — frontend developer and computer science student at UiTM Shah Alam.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060607",
+  "theme_color": "#060607",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

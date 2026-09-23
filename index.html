@@ -1,209 +1,684 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark" data-motion="full">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aidil Azani – Portfolio</title>
-    <meta name="description" content="Portfolio of Aidil Azani — frontend developer and computer science student.">
+
+    <title>Aidil Azani - Frontend developer in Shah Alam, Malaysia</title>
+    <meta name="description"
+        content="Aidil Azani, frontend developer and computer science student at UiTM Shah Alam. A semantic travel search engine in Flask, a portfolio written by hand with zero dependencies, and photographs.">
+
+    <!-- Seed theme + motion before first paint so neither flashes. -->
     <script>
         (function () {
-            var t; try { t = localStorage.getItem('theme'); } catch (e) { }
-            document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            var t, m; try { t = localStorage.getItem('theme'); m = localStorage.getItem('motion'); } catch (e) { }
+            var d = document.documentElement;
+            d.className = d.className.replace(/\bno-js\b/, 'js');
+            d.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            d.setAttribute('data-motion', m === 'reduced' ? 'reduced' : 'full');
         })();
     </script>
-    <link rel="stylesheet" href="css/portfolio.css">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#060607" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Jost:wght@400..700&family=Space+Grotesk:wght@300..700&display=swap">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/stack.css">
+    <link rel="stylesheet" href="css/tilt.css">
+    <link rel="stylesheet" href="css/hero.css">
+    <link rel="stylesheet" href="css/home.css">
+
+    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Aidil Azani">
+    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/">
+    <meta property="og:title" content="Aidil Azani - Frontend developer in Shah Alam, Malaysia">
+    <meta property="og:description"
+        content="A semantic travel search engine in Flask, a portfolio written by hand with zero dependencies, and photographs.">
+    <meta property="og:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:image:alt" content="Aidil Azani">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@aidilazani">
+    <meta name="twitter:creator" content="@aidilazani">
+    <meta name="twitter:title" content="Aidil Azani - Frontend developer in Shah Alam, Malaysia">
+    <meta name="twitter:description"
+        content="A semantic travel search engine in Flask, a portfolio written by hand with zero dependencies, and photographs.">
+    <meta name="twitter:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Aidil Azani",
+        "url": "https://haidilazani.github.io/Portfolio/",
+        "inLanguage": "en",
+        "author": { "@type": "Person", "name": "Aidil Azani" }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Aidil Azani",
+        "jobTitle": "Frontend developer",
+        "url": "https://haidilazani.github.io/Portfolio/",
+        "image": "https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg",
+        "email": "mailto:haidilazani@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Shah Alam",
+          "addressRegion": "Selangor",
+          "addressCountry": "MY"
+        },
+        "alumniOf": { "@type": "CollegeOrUniversity", "name": "UiTM Shah Alam" },
+        "knowsAbout": ["Frontend development", "JavaScript", "CSS", "Canvas 2D", "Flask", "Sentence embeddings"],
+        "sameAs": [
+          "https://github.com/haidilazani",
+          "https://linkedin.com/in/azuhaidilazani",
+          "https://x.com/aidilazani",
+          "https://instagram.com/aidilazani"
+        ]
+      }
+    ]
+    </script>
 </head>
 
-<body>
+<body class="page-home">
 
-    <header class="site-nav">
-        <nav class="glass-nav" aria-label="Main navigation">
-            <a href="index.html" class="nav-logo">aidil<span>.</span></a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav" data-nav>
+        <nav class="nav-inner" aria-label="Primary">
+            <a class="nav-logo" href="index.html" aria-current="page">aidil<span>.</span></a>
             <ul class="nav-links">
                 <li class="nav-indicator" aria-hidden="true"></li>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
                 <li><a href="work.html">Work</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="memory.html">Memory</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="blog.html">Writing</a></li>
+                <li><a href="photography.html">Photography</a></li>
             </ul>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark / light mode">
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-                </svg>
-            </button>
+            <div class="nav-actions">
+                <button class="cmdk-trigger" type="button" data-cmdk-open>Search <kbd>&#8984;K</kbd></button>
+                <button class="icon-btn" type="button" data-motion-toggle aria-pressed="false"
+                    aria-label="Toggle reduced motion">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M3 12h3.2l2.6-7 4.4 14 2.6-7H21" />
+                    </svg>
+                </button>
+                <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false"
+                    aria-label="Toggle colour theme">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+                    </svg>
+                </button>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <main id="main">
 
-        <!-- Hero -->
-        <section class="hero container">
-            <span class="eyebrow">Portfolio — Aidil Azani</span>
-            <h1>A remembrance of<br><span class="gradient-text">who I was.</span></h1>
-            <p class="lede">Live in a world without purpose, I was lost in the vast space — now in search of my
-                soul, building things for the web along the way.</p>
-            <div class="hero-actions">
-                <a href="work.html" class="btn btn-primary">View my work</a>
-                <a href="#contact" class="btn btn-ghost">Get in touch</a>
-            </div>
-            <div class="scroll-indicator">
-                <p>Scroll</p>
-                <div class="scroll-icon"></div>
-            </div>
-        </section>
+        <!-- ================================================================
+             Hero
+             Base band. The terrain canvas is the living ground; two outlined
+             marquee rows of the name run over it in opposite directions,
+             and the headline sits below in solid ink so it never has to compete with an outline.
+             ================================================================ -->
+        <section class="hero band" data-hero aria-labelledby="hero-title">
+            <canvas class="hero-canvas" data-hero-canvas aria-hidden="true"></canvas>
 
-        <!-- Featured work -->
-        <section id="featured" class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Selected Work</span>
-                <h2 class="section-title">Things I've built.</h2>
-                <p class="section-subtitle">A few projects that shaped the developer I am becoming — from client
-                    sites to experiments of my own.</p>
-            </div>
-            <div class="card-grid">
-                <a href="work.html" class="glass-card reveal">
-                    <div class="card-thumb thumb-a">aidil.</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Web</span><span class="dot"></span><span>2026</span></div>
-                        <h3>Personal Portfolio</h3>
-                        <p>This very site — a minimalist, liquid-glass portfolio built with nothing but HTML, CSS
-                            and JavaScript.</p>
+            <div class="hero-stage">
+                <div class="marquee" data-marquee aria-hidden="true">
+                    <div class="marquee-track">
+                        <span>aidil azani.</span><span>aidil azani.</span><span>aidil azani.</span>
+                        <span>aidil azani.</span><span>aidil azani.</span><span>aidil azani.</span>
                     </div>
-                </a>
-                <a href="work.html" class="glass-card reveal reveal-delay-1">
-                    <div class="card-thumb thumb-b">JS</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Client Work</span><span class="dot"></span><span>2023–24</span></div>
-                        <h3>JustSimple Projects</h3>
-                        <p>Frontend development for client websites — WordPress, Elementor and custom styling.</p>
-                    </div>
-                </a>
-                <a href="work.html" class="glass-card reveal reveal-delay-2">
-                    <div class="card-thumb thumb-c">ML</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Data Science</span><span class="dot"></span><span>Ongoing</span></div>
-                        <h3>Academic Projects</h3>
-                        <p>Machine learning and data science work from my computer science degree at UiTM.</p>
-                    </div>
-                </a>
-            </div>
-            <div class="section-footer reveal">
-                <a href="work.html" class="text-link">See all work <span>→</span></a>
-            </div>
-        </section>
-
-        <!-- About teaser -->
-        <section id="about" class="container">
-            <div class="about-split">
-                <div class="about-photo reveal">
-                    <img src="images/about.JPEG" alt="Aidil Azani">
                 </div>
-                <div class="about-copy reveal reveal-delay-1">
-                    <span class="eyebrow">About Me</span>
-                    <h2 class="section-title">Meet myself.</h2>
-                    <p>I'm <strong>Aidil</strong> — I've chosen this path not knowing it would burn my brain and
-                        soul. Yet I'm still standing here, pursuing what my heart never craved for, and somewhere
-                        along the way it became mine.</p>
-                    <p>Computer science student by day, frontend developer at heart, photographer whenever the
-                        light is right.</p>
-                    <div class="skills">
-                        <span class="skill-tag">Web Development</span>
-                        <span class="skill-tag">UI/UX Design</span>
-                        <span class="skill-tag">Data Science</span>
-                        <span class="skill-tag">Photography</span>
+                <div class="marquee marquee--reverse" data-marquee aria-hidden="true">
+                    <div class="marquee-track">
+                        <span>aidil azani.</span><span>aidil azani.</span><span>aidil azani.</span>
+                        <span>aidil azani.</span><span>aidil azani.</span><span>aidil azani.</span>
                     </div>
-                    <a href="about.html" class="text-link">More about me <span>→</span></a>
+                </div>
+
+                <a class="round-btn hero-down" href="#practice" data-magnetic aria-label="Scroll to what I do">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M7 10l5 5 5-5" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="hero-inner container">
+                <div class="hero-heading">
+                    <p class="hero-eyebrow">Frontend developer &#183; CS @ UiTM Shah Alam &#183; Open to internships</p>
+                    <h1 class="hero-title" id="hero-title">A remembrance of<br><em class="accent-word" data-dial>who I was.</em></h1>
+                </div>
+                <div class="hero-aside">
+                    <p class="hero-lede">I was lost in the vast space, in search of my soul, and somewhere along the way
+                        I started building for the web: by hand, with no framework and no build step.</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="work.html" data-magnetic>View my work</a>
+                        <a class="btn btn-ghost" href="#contact">Get in touch</a>
+                    </div>
+                    <div class="hero-hint"><kbd>move</kbd> to stir the terrain &#183; <kbd>click</kbd> to ripple</div>
                 </div>
             </div>
         </section>
 
-        <!-- Contact -->
-        <section id="contact" class="container">
-            <div class="contact-wrap">
-                <div class="section-head centered reveal">
-                    <span class="eyebrow">Contact</span>
-                    <h2 class="section-title">Let's connect.</h2>
-                    <p class="section-subtitle">A small talk that could lead to bigger possibilities — not just a
-                        dream or vision, but an objective to create something new.</p>
-                </div>
+        <!-- ================================================================
+             What I do: the keyword roller
+             ================================================================ -->
+        <section class="band practice" id="practice" aria-labelledby="practice-title">
+            <div class="container practice-grid">
+                <div class="dash-grid" aria-hidden="true"></div>
 
-                <form class="contact-form reveal">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Full name" required>
+                <div class="practice-body">
+                    <p class="practice-mark" aria-hidden="true"><span class="practice-rule"></span><span
+                            class="practice-logo">aidil<span>.</span></span></p>
+
+                    <h2 class="visually-hidden" id="practice-title">What I do: frontend development, Canvas 2D,
+                        photography and writing.</h2>
+
+                    <div class="roller" data-roller aria-hidden="true">
+                        <div class="roller-mask">
+                            <ul class="roller-col">
+                                <li>Frontend.</li>
+                                <li>Canvas 2D.</li>
+                                <li>Photography.</li>
+                                <li>Writing.</li>
+                            </ul>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="email@example.com" required>
+                        <div class="roller-mask roller-mask--echo">
+                            <ul class="roller-col">
+                                <li>Frontend.</li>
+                                <li>Canvas 2D.</li>
+                                <li>Photography.</li>
+                                <li>Writing.</li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" name="subject" placeholder="What is this about?" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" placeholder="Your message here..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Send message</button>
-                    <p class="form-note">This opens your mail app with the message pre-filled.</p>
-                </form>
 
-                <div class="social-links reveal">
-                    <a href="https://linkedin.com/in/azuhaidilazani" class="social-link" title="LinkedIn" target="_blank"
-                        rel="noopener" aria-label="LinkedIn">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.77c1.4-2.59 7-2.78 7 2.47v6.76z" />
-                        </svg>
-                    </a>
-                    <a href="https://github.com/haidilazani" class="social-link" title="GitHub" target="_blank"
-                        rel="noopener" aria-label="GitHub">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.63 0-12 5.37-12 12 0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.28-.01-1.02-.02-2.01-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23.96-.27 1.98-.4 3-.4s2.04.14 3 .4c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.21.7.82.58 4.77-1.59 8.2-6.09 8.2-11.39 0-6.63-5.37-12-12-12z" />
-                        </svg>
-                    </a>
-                    <a href="https://twitter.com/aidilazani" class="social-link" title="X" target="_blank"
-                        rel="noopener" aria-label="X (Twitter)">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.966 6.817h-3.31l7.73-8.835-8.156-10.665h6.826l4.713 6.231zm-1.161 17.52h1.833l-11.83-15.644h-1.967z" />
-                        </svg>
-                    </a>
-                    <a href="https://instagram.com/aidilazani" class="social-link" title="Instagram" target="_blank"
-                        rel="noopener" aria-label="Instagram">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="5"></rect>
-                            <circle cx="12" cy="12" r="4"></circle>
-                            <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"></circle>
-                        </svg>
-                    </a>
-                    <a href="mailto:haidilazani@gmail.com" class="social-link" title="Email" aria-label="Email">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="3"></rect>
-                            <path d="m2 7 10 7 10-7"></path>
+                    <a class="round-btn" href="#work" aria-label="Scroll to selected work">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                            stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                            focusable="false">
+                            <path d="M7 10l5 5 5-5" />
                         </svg>
                     </a>
                 </div>
             </div>
         </section>
+
+        <!-- ================================================================
+             Selected work
+             Inverse band. One split block per project: a sticky rail on the
+             left (title, counter, lede, stack, links) and the photograph plus
+             case detail on the right. The giant outlined word slides across
+             as the image passes and fills where it crosses the frame.
+             ================================================================ -->
+        <section class="band band--invert work" id="work" aria-labelledby="work-title">
+            <div class="container">
+
+                <header class="work-intro" data-reveal style="--reveal-i: 0">
+                    <h2 class="kicker" id="work-title"><span>Selected</span> <span>work.</span></h2>
+                    <p class="work-sub">Three things I built and can still explain line by line. Two of them you
+                        can open right now; the third is source you can read.</p>
+                </header>
+
+                <!-- GeoTour: repo-only. No outcome is verified, so no outcome is claimed. -->
+                <article class="work-item" id="work-geotour" aria-labelledby="work-geotour-title">
+                    <div class="work-rail" data-reveal style="--reveal-i: 1">
+                        <div class="work-head">
+                            <h3 class="work-title" id="work-geotour-title">GeoTour, a semantic tourism recommendation system</h3>
+                            <p class="work-count" aria-hidden="true"><b>01</b> / 03</p>
+                        </div>
+                        <p class="case-label">2026 &#183; Final-year project, Flask + NLP</p>
+                        <p class="work-lede">A travel search engine that understands <strong>&#8220;quiet mountain
+                                ruins&#8221;</strong> instead of matching keywords: <strong>BERT embeddings</strong>
+                            over a <strong>1,155-site UNESCO World Heritage dataset</strong>, plus an <strong>ontology
+                                graph</strong> you can explore.</p>
+                        <ul class="project-stack">
+                            <li class="tag">Python</li>
+                            <li class="tag">Flask</li>
+                            <li class="tag">SQLAlchemy</li>
+                            <li class="tag">sentence-transformers</li>
+                            <li class="tag">NetworkX</li>
+                            <li class="tag">pandas</li>
+                        </ul>
+                        <div class="project-links">
+                            <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/FYP-1"
+                                target="_blank" rel="noopener">Read the source</a>
+                        </div>
+                        <a class="round-btn" href="#work-portfolio" aria-label="Next project: this portfolio">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                focusable="false">
+                                <path d="M7 10l5 5 5-5" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="work-media">
+                        <figure class="work-figure" data-slide data-reveal="fade" style="--reveal-i: 1">
+                            <div class="work-frame-wrap">
+                                <div class="work-frame" data-tilt>
+                                    <picture>
+                                        <source type="image/webp"
+                                            srcset="images/optimized/petronas-towers-800.webp 800w, images/optimized/petronas-towers-1600.webp 1600w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)">
+                                        <img src="images/optimized/petronas-towers-800.jpg"
+                                            srcset="images/optimized/petronas-towers-800.jpg 800w, images/optimized/petronas-towers-1600.jpg 1600w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)"
+                                            alt="The Petronas Twin Towers at night, photographed from street level so the two towers lean toward each other and meet at the lit sky bridge."
+                                            width="800" height="1066" loading="lazy" decoding="async">
+                                    </picture>
+                                    <span class="slide-word slide-word--fill" aria-hidden="true">geotour.</span>
+                                </div>
+                                <span class="slide-word slide-word--line" aria-hidden="true">geotour.</span>
+                            </div>
+                            <figcaption>Kuala Lumpur, 2025. Photograph by Aidil.</figcaption>
+                        </figure>
+
+                        <div class="case-grid">
+                            <div class="case-block" data-label="Problem">
+                                <p>Keyword search fails travellers who describe the feeling of a place rather than its
+                                    name, and destination datasets carry rich category metadata that plain text
+                                    matching throws away.</p>
+                            </div>
+                            <div class="case-block" data-label="Approach">
+                                <p>A Flask + SQLAlchemy app encodes each point of interest as a rich document (name,
+                                    ontology categories, description) with the all-MiniLM-L6-v2 sentence
+                                    transformer, ranks queries by cosine similarity, filters by country names
+                                    detected in the query, and ships a second Flask app that renders the category
+                                    ontology as an interactive graph with a spreading-activation search (0.5 decay,
+                                    up to 6 hops).</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- This portfolio: live + repo. -->
+                <article class="work-item" id="work-portfolio" aria-labelledby="work-portfolio-title">
+                    <div class="work-rail" data-reveal style="--reveal-i: 1">
+                        <div class="work-head">
+                            <h3 class="work-title" id="work-portfolio-title">This portfolio</h3>
+                            <p class="work-count" aria-hidden="true"><b>02</b> / 03</p>
+                        </div>
+                        <p class="case-label">2026 &#183; Personal site, vanilla web</p>
+                        <p class="work-lede"><strong>Six pages, 9,950 lines, 103 KB gzipped</strong> of hand-written
+                            HTML, CSS and JavaScript: <strong>no framework, no bundler, no dependencies</strong>,
+                            including a <strong>topographic contour background</strong> drawn with marching squares.
+                        </p>
+                        <ul class="project-stack">
+                            <li class="tag">HTML</li>
+                            <li class="tag">CSS custom properties</li>
+                            <li class="tag">JavaScript (ES6)</li>
+                            <li class="tag">Canvas 2D</li>
+                            <li class="tag">GitHub Pages</li>
+                        </ul>
+                        <div class="project-links">
+                            <a class="pill-link pill-link--live" href="https://haidilazani.github.io/Portfolio/"
+                                target="_blank" rel="noopener">Open the live site</a>
+                            <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/Portfolio"
+                                target="_blank" rel="noopener">Read the source</a>
+                        </div>
+                        <a class="round-btn" href="#work-buttermax" aria-label="Next project: Buttermax">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                                focusable="false">
+                                <path d="M7 10l5 5 5-5" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="work-media">
+                        <figure class="work-figure" data-slide data-reveal="fade" style="--reveal-i: 1">
+                            <div class="work-frame-wrap">
+                                <div class="work-frame" data-tilt>
+                                    <picture>
+                                        <source type="image/webp"
+                                            srcset="images/optimized/mount-jerai-sky-400.webp 400w, images/optimized/mount-jerai-sky-800.webp 800w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)">
+                                        <img src="images/optimized/mount-jerai-sky-800.jpg"
+                                            srcset="images/optimized/mount-jerai-sky-400.jpg 400w, images/optimized/mount-jerai-sky-800.jpg 800w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)"
+                                            alt="A night sky dense with stars above Mount Jerai, faint cloud drifting through the middle of the frame and tree canopies silhouetted in two corners."
+                                            width="800" height="1066" loading="lazy" decoding="async">
+                                    </picture>
+                                    <span class="slide-word slide-word--fill" aria-hidden="true">portfolio.</span>
+                                </div>
+                                <span class="slide-word slide-word--line" aria-hidden="true">portfolio.</span>
+                            </div>
+                            <figcaption>Mount Jerai, 2024. Photograph by Aidil.</figcaption>
+                        </figure>
+
+                        <div class="case-grid">
+                            <div class="case-block" data-label="Problem">
+                                <p>I wanted a portfolio I fully understood: no framework whose behaviour I couldn't
+                                    explain in an interview, and nothing a recruiter's phone would have to download a
+                                    megabyte of JavaScript to read.</p>
+                            </div>
+                            <div class="case-block" data-label="Approach">
+                                <p>Everything is written by hand: a theme toggle that sets data-theme before first
+                                    paint to avoid a flash, a liquid nav indicator, scroll-reveal, a command palette
+                                    and page transitions in one dependency-free script, and a canvas background that
+                                    generates two value-noise fields, cross-fades them to make the terrain breathe,
+                                    and traces five to nine elevation contours per frame with marching squares. Taps
+                                    still ripple on touch; anyone who prefers reduced motion gets a single static
+                                    render.</p>
+                            </div>
+                            <div class="case-block" data-label="Outcome">
+                                <p>Live on GitHub Pages (HTTP 200) with zero dependencies and zero build step; total
+                                    HTML+CSS+JS payload is 393 KB uncompressed, 103 KB gzipped, across 16 files.</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Buttermax: live + repo, no case-study blocks. -->
+                <article class="work-item" id="work-buttermax" aria-labelledby="work-buttermax-title">
+                    <div class="work-rail" data-reveal style="--reveal-i: 1">
+                        <div class="work-head">
+                            <h3 class="work-title" id="work-buttermax-title">Buttermax, a WebGL design study</h3>
+                            <p class="work-count" aria-hidden="true"><b>03</b> / 03</p>
+                        </div>
+                        <p class="case-label">2026 &#183; Front-end study, raw WebGL</p>
+                        <p class="work-lede">A <strong>four-page, dependency-free reinterpretation</strong> of an
+                            Awwwards-winning studio site, including a <strong>hand-written fragment shader</strong>
+                            with fbm domain warping and a <strong>Lenis-style inertia scroller</strong>, built to learn
+                            how that class of site is made.</p>
+                        <ul class="project-stack">
+                            <li class="tag">JavaScript</li>
+                            <li class="tag">WebGL / GLSL</li>
+                            <li class="tag">HTML</li>
+                            <li class="tag">CSS</li>
+                        </ul>
+                        <div class="project-links">
+                            <a class="pill-link pill-link--live" href="https://haidilazani.github.io/Assignment/"
+                                target="_blank" rel="noopener">Open the live site</a>
+                            <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/Assignment"
+                                target="_blank" rel="noopener">Read the source</a>
+                        </div>
+                        <a class="btn btn-outline" href="work.html">View my work</a>
+                    </div>
+
+                    <div class="work-media">
+                        <figure class="work-figure" data-slide data-reveal="fade" style="--reveal-i: 1">
+                            <div class="work-frame-wrap">
+                                <div class="work-frame" data-tilt>
+                                    <picture>
+                                        <source type="image/webp"
+                                            srcset="images/optimized/baskara-on-the-mic-800.webp 800w, images/optimized/baskara-on-the-mic-1600.webp 1600w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)">
+                                        <img src="images/optimized/baskara-on-the-mic-800.jpg"
+                                            srcset="images/optimized/baskara-on-the-mic-800.jpg 800w, images/optimized/baskara-on-the-mic-1600.jpg 1600w"
+                                            sizes="(min-width: 64em) 42rem, calc(100vw - 2.5rem)"
+                                            alt="Baskara Putra singing into a handheld microphone with his head tipped back, lit through green and amber haze, a keyboardist and the silhouetted crowd around him."
+                                            width="800" height="1366" loading="lazy" decoding="async">
+                                    </picture>
+                                    <span class="slide-word slide-word--fill" aria-hidden="true">buttermax.</span>
+                                </div>
+                                <span class="slide-word slide-word--line" aria-hidden="true">buttermax.</span>
+                            </div>
+                            <figcaption>Baskara on the mic, 2023. Photograph by Aidil.</figcaption>
+                        </figure>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Numbers: only facts already stated elsewhere on the site.
+             ================================================================ -->
+        <section class="band stats" aria-labelledby="stats-title">
+            <div class="container">
+                <h2 class="visually-hidden" id="stats-title">In numbers</h2>
+                <ul class="stats-list">
+                    <li class="stat" data-reveal style="--reveal-i: 0">
+                        <p class="stat-figure">
+                            <span class="stat-sizer" aria-hidden="true">2023</span>
+                            <span class="stat-num" data-count="2023">2023</span>
+                            <span class="stat-echo" aria-hidden="true">2023</span>
+                        </p>
+                        <p class="stat-label"><strong>The year I started building client websites</strong>, at
+                            JustSimple Sdn. Bhd.</p>
+                    </li>
+                    <li class="stat" data-reveal style="--reveal-i: 1">
+                        <p class="stat-figure">
+                            <span class="stat-sizer" aria-hidden="true">1,155</span>
+                            <span class="stat-num" data-count="1,155">1,155</span>
+                            <span class="stat-echo" aria-hidden="true">1,155</span>
+                        </p>
+                        <p class="stat-label"><strong>UNESCO World Heritage sites</strong> GeoTour ranks by meaning
+                            instead of keywords.</p>
+                    </li>
+                    <li class="stat" data-reveal style="--reveal-i: 1">
+                        <p class="stat-figure">
+                            <span class="stat-sizer" aria-hidden="true">1,390</span>
+                            <span class="stat-num" data-count="1,390">1,390</span>
+                            <span class="stat-echo" aria-hidden="true">1,390</span>
+                        </p>
+                        <p class="stat-label"><strong>Lines of vanilla JS</strong> behind the contour terrain at the
+                            top of this page.</p>
+                    </li>
+                    <li class="stat" data-reveal style="--reveal-i: 2">
+                        <p class="stat-figure">
+                            <span class="stat-sizer" aria-hidden="true">0</span>
+                            <span class="stat-num">0</span>
+                            <span class="stat-echo" aria-hidden="true">0</span>
+                        </p>
+                        <p class="stat-label"><strong>npm packages, bundlers or frameworks</strong> on this site.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             About teaser: the paragraph lights word by word as it scrolls.
+             ================================================================ -->
+        <section class="band band--invert about" id="about" aria-labelledby="about-title">
+            <div class="container about-split">
+
+                <div class="about-side">
+                    <h2 class="section-title home-title" id="about-title" data-reveal style="--reveal-i: 0">Who is
+                        <em class="accent-word">writing this.</em></h2>
+                    <figure class="about-portrait" data-reveal="fade" style="--reveal-i: 1">
+                        <picture>
+                            <source type="image/webp"
+                                srcset="images/optimized/about-400.webp 400w, images/optimized/about-800.webp 800w"
+                                sizes="(min-width: 64em) 18rem, 60vw">
+                            <img src="images/optimized/about-800.jpg"
+                                srcset="images/optimized/about-400.jpg 400w, images/optimized/about-800.jpg 800w"
+                                sizes="(min-width: 64em) 18rem, 60vw"
+                                alt="Aidil Azani, photographed close up against a plain background" width="800"
+                                height="800" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
+                </div>
+
+                <div class="about-main">
+                    <p class="about-lead" data-highlight>Computer science student at <strong>UiTM Shah
+                            Alam</strong> and a <strong>frontend developer</strong>. I spent 2023-2024 building client
+                        websites at <strong>JustSimple Sdn. Bhd.</strong>, and I write interfaces by hand: this whole
+                        site is <strong>~10,000 lines of vanilla HTML, CSS and JavaScript</strong> with no framework.
+                        <strong>Photographer</strong> when the light is right.</p>
+                    <p class="section-foot"><a class="btn btn-outline" href="about.html">More about me</a></p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Writing teaser: the stacking cards
+             ================================================================ -->
+        <section class="band writing" id="writing" aria-labelledby="writing-title">
+            <div class="container writing-split">
+
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title home-title" id="writing-title">Notes in <em
+                            class="accent-word">progress.</em></h2>
+                    <p class="section-sub">Nothing is published yet. These two are the ones I'm drafting first,
+                        because the code they describe already exists.</p>
+                    <p class="section-foot">
+                        <a class="btn btn-outline" href="blog.html">See what's coming</a>
+                    </p>
+                </div>
+
+                <div class="post-list">
+                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 1">
+                        <p class="post-status">Planned</p>
+                        <h3 class="post-title">Drawing an interactive topographic map in vanilla JS</h3>
+                        <p class="post-blurb">The background of this site is not an image and not a library. It's
+                            two value-noise fields cross-faded to make terrain breathe, traced into nine contour
+                            lines every frame with marching squares, with the cursor added as a Gaussian hill so the
+                            rings bulge around your pointer.</p>
+                    </article>
+
+                    <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 2">
+                        <p class="post-status">Planned</p>
+                        <h3 class="post-title">Teaching a search box what &#8220;quiet mountain ruins&#8221; means</h3>
+                        <p class="post-blurb">My final-year project ranks 1,155 UNESCO World Heritage sites by
+                            meaning instead of keywords. Notes on sentence embeddings, on why the category ontology
+                            mattered more than the model, and on spreading activation as a way to walk a graph of
+                            concepts.</p>
+                    </article>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Contact
+             ================================================================ -->
+        <section class="band band--invert contact" id="contact" aria-labelledby="contact-title">
+            <div class="container">
+
+                <div class="contact-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title home-title contact-line" id="contact-title">Get in <em
+                            class="accent-word">touch.</em></h2>
+                    <p class="section-sub">Open to internships and freelance, in Malaysia or remote. Shah Alam,
+                        Selangor.</p>
+                </div>
+
+                <div class="contact-grid">
+
+                    <!-- Get a free form ID at formspree.io (New Form, then copy the ID out of the endpoint URL) and paste it below; until then js/app.js intercepts the submit and falls back to mailto:haidilazani@gmail.com. -->
+                    <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST"
+                        data-reveal style="--reveal-i: 1">
+
+                        <div class="field-row">
+                            <div class="field">
+                                <label class="field-label" for="contact-name">Name</label>
+                                <input class="field-input" type="text" id="contact-name" name="name"
+                                    autocomplete="name" required aria-describedby="contact-name-error">
+                                <p class="field-error" id="contact-name-error"></p>
+                            </div>
+
+                            <div class="field">
+                                <label class="field-label" for="contact-email">Email</label>
+                                <input class="field-input" type="email" id="contact-email" name="email"
+                                    autocomplete="email" required aria-describedby="contact-email-error">
+                                <p class="field-error" id="contact-email-error"></p>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="contact-message">Message</label>
+                            <textarea class="field-input" id="contact-message" name="message" rows="6" required
+                                aria-describedby="contact-message-error"></textarea>
+                            <p class="field-error" id="contact-message-error"></p>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit" data-magnetic>Send message</button>
+
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+
+                    <aside class="contact-aside" data-reveal style="--reveal-i: 2">
+                        <p class="field-label">Or just email me</p>
+                        <button class="btn btn-ghost" type="button" data-copy="haidilazani@gmail.com">
+                            haidilazani@gmail.com
+                        </button>
+
+                        <ul class="social-links">
+                            <li><a class="social-link" href="https://github.com/haidilazani" target="_blank"
+                                    rel="me noopener">GitHub</a></li>
+                            <li><a class="social-link" href="https://linkedin.com/in/azuhaidilazani" target="_blank"
+                                    rel="me noopener">LinkedIn</a></li>
+                            <li><a class="social-link" href="https://x.com/aidilazani" target="_blank"
+                                    rel="me noopener">X</a></li>
+                            <li><a class="social-link" href="https://instagram.com/aidilazani" target="_blank"
+                                    rel="me noopener">Instagram</a></li>
+                            <li><a class="social-link" href="mailto:haidilazani@gmail.com">Email</a></li>
+                        </ul>
+                    </aside>
+
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer>
-        &copy; 2026 Aidil Azani. All rights reserved.
+    <footer class="site-footer band band--invert">
+        <div class="container footer-inner">
+            <nav class="footer-links" aria-label="Footer">
+                <a href="work.html">Work</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Writing</a>
+                <a href="photography.html">Photography</a>
+                <a href="mailto:haidilazani@gmail.com">Email</a>
+            </nav>
+            <p class="footer-meta">&copy; 2026 Aidil Azani. Written by hand in HTML, CSS and JavaScript. No
+                dependencies, no build step.</p>
+            <p class="footer-brand"><a href="index.html">aidil<span>.</span></a></p>
+        </div>
     </footer>
 
-    <script src="js/navbar.js"></script>
-    <script src="js/background.js"></script>
+    <!-- Command palette -->
+    <div class="cmdk" data-cmdk hidden>
+        <div class="cmdk-panel" aria-label="Search this site">
+            <input class="cmdk-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Search pages, projects and writing" aria-label="Search pages, projects and writing">
+            <ul class="cmdk-list">
+                <li><a class="cmdk-item" href="work.html">Work</a></li>
+                <li><a class="cmdk-item" href="about.html">About</a></li>
+                <li><a class="cmdk-item" href="blog.html">Writing</a></li>
+                <li><a class="cmdk-item" href="photography.html">Photography</a></li>
+                <li><a class="cmdk-item" href="index.html#contact">Contact</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani/FYP-1" target="_blank"
+                        rel="noopener">GeoTour source</a></li>
+                <li><a class="cmdk-item" href="https://haidilazani.github.io/Assignment/" target="_blank"
+                        rel="noopener">Buttermax study</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani" target="_blank"
+                        rel="noopener">GitHub</a></li>
+                <li><a class="cmdk-item" href="mailto:haidilazani@gmail.com">Email Aidil</a></li>
+            </ul>
+            <p class="cmdk-empty" hidden>Nothing matches that.</p>
+        </div>
+    </div>
+
+    <script src="js/app.js" defer></script>
+    <script src="js/stack.js" defer></script>
+    <script src="js/tilt.js" defer></script>
+    <script src="js/hero.js" defer></script>
+    <script src="js/home.js" defer></script>
 </body>
 
 </html>

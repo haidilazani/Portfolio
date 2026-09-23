@@ -1,0 +1,507 @@
+/* ==========================================================================
+   hero.css - the home hero: layout, the outlined name marquee, type, the
+   terrain canvas and the odometer dial on the keyword.
+
+   Composition (after litup.fr): a full-viewport base band. The canvas is
+   the living ground. Two rows of the owner's name, set huge in outline
+   only, run as marquees in opposite directions across the upper stage, and
+   a circular button drops to the next section. The headline sits below the stage in solid
+   ink, never on top of an outline, so it always reads first.
+
+   Every value comes from css/tokens.css. The locally-defined custom
+   properties are:
+
+     --hero-nav-h     height reserved for the site nav. Falls back to 4.5rem
+                      if main.css has not published --nav-h.
+     --hero-anim      the entrance animation name, switched to `none`
+                      whenever motion is not allowed. Set on .hero and
+                      inherited, so one rule turns the whole entrance off.
+                      --hero-fade-anim is the same switch for the rows' fade.
+     --marquee-anim   the same switch for the two marquee rows.
+     --dial-anim      the same switch for the keyword's odometer roll.
+     --dial-cell      the fixed height of one character mask in the keyword.
+                      Also the keyword's line-height, which is what keeps the
+                      masks and the surrounding text on one baseline grid.
+
+   MOTION GATING
+   Two selectors set the three animation switches, mirroring the resolution
+   order in hero.js: the site's own motion toggle (html[data-motion]) wins
+   when present, and the OS preference decides when it is absent. With JS
+   off the media-query path still applies, and with animations off every
+   element simply renders in its final state: the marquee rows sit still,
+   offset from each other, and the dial rests on its final letters.
+
+   LCP
+   The headline is the LCP element and is never gated on JavaScript or on
+   the canvas. The canvas is absolutely positioned and fades itself in. The
+   keyword's real text ships in the HTML; the dial only ever moves glyphs
+   *inside* boxes whose width was already reserved by a hidden per-character
+   sizer, and .accent-word's line-height is declared here rather than by the
+   script, so enhancing the heading cannot shift a single pixel.
+   ========================================================================== */
+
+/* ---- 1. Section shell -------------------------------------------------- */
+
+.hero {
+  --hero-nav-h: var(--nav-h, 4.5rem);
+  --hero-anim: none;
+  --hero-fade-anim: none;
+  --marquee-anim: none;
+  --dial-anim: none;
+  --marquee-stroke: color-mix(in srgb, var(--text) 58%, transparent);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  row-gap: var(--s-6);
+
+  /* 100dvh, not 100vh: the mobile URL bar must not resize the terrain. */
+  min-height: 100dvh;
+  padding-block: calc(var(--hero-nav-h) + var(--s-4)) var(--s-7);
+}
+
+/* The canvas is sized entirely by CSS, so it can never cause layout shift
+   while hero.js is measuring and setting its backing-store resolution. */
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-canvas, 0);
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  /* Hero content stays fully clickable: pointer events pass straight
+     through the canvas, and hero.js listens on .hero instead. */
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity var(--dur-slow, 600ms) var(--ease-out);
+}
+
+.hero-canvas[data-ready] { opacity: 1; }
+
+/* Seats the terrain in the page: contours dissolve into --bg at the top edge
+   (under the nav) and at the bottom edge (into the next section) instead of
+   being cut off by overflow.
+
+   This pseudo-element is the last box in .hero's tree order, so at the same
+   z-index it paints over the canvas. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, var(--bg) 0%, transparent 14%, transparent 72%, var(--bg) 100%);
+}
+
+/* ---- 1b. The stage: marquee rows and drop button ------------------------ */
+
+/* Full bleed: the stage is a direct child of .hero, not of .container, so
+   the rows run edge to edge exactly as they do on the reference. */
+.hero-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: center;
+  justify-items: center;
+  min-height: 0;
+}
+
+/* One row. overflow: clip (not hidden) so the row never becomes a scroll
+   container, and the page can never scroll sideways at 375px. Pointer
+   events pass through to the terrain underneath. */
+.marquee {
+  grid-column: 1;
+  width: 100%;
+  overflow: clip;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  font-family: var(--font-poster);
+  font-size: var(--fs-poster);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  color: var(--marquee-stroke);
+}
+
+/* Outline only where the stroke is supported; elsewhere the rows fall back
+   to a dim solid fill rather than vanishing. */
+@supports (-webkit-text-stroke: 1px) {
+  .marquee {
+    color: transparent;
+    -webkit-text-stroke: var(--hairline) var(--marquee-stroke);
+  }
+}
+
+.marquee:first-child { grid-row: 1; }
+.marquee--reverse { grid-row: 2; }
+
+/* Six identical spans; the loop travels exactly half of them, so the
+   restart frame is pixel-identical to the first. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation-name: var(--marquee-anim);
+  animation-duration: 42s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.marquee-track > span { padding-inline-end: 0.28em; }
+
+/* Still (reduced motion, or before the animation starts) the two rows sit
+   offset against each other, the way the moving rows mostly read. */
+.marquee--reverse .marquee-track {
+  transform: translate3d(-22%, 0, 0);
+  animation-direction: reverse;
+}
+
+/* home.js pauses a row the moment it leaves the viewport or the tab hides. */
+.marquee.is-paused .marquee-track { animation-play-state: paused; }
+
+@keyframes hero-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.hero-down {
+  grid-column: 1;
+  grid-row: 3;
+  margin-block-start: var(--s-5);
+}
+
+/* ---- 1c. Heading row --------------------------------------------------- */
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: end;
+}
+
+@media (min-width: 56em) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    column-gap: var(--s-8);
+  }
+}
+
+/* ---- 3. Type ------------------------------------------------------------ */
+
+/* The reference's stacked uppercase label: small, bold, tracked, in the
+   display face rather than mono. */
+.hero-eyebrow {
+  margin: 0 0 var(--s-4);
+  font-family: var(--font-poster);
+  font-size: var(--fs-kicker);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.hero-title {
+  margin: 0;
+  font-family: var(--font-poster);
+  font-size: var(--fs-hero);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+/* The keyword. Same face and weight as the rest of the headline: the
+   contrast is tone (secondary against ink), the same grey-to-ink pairing
+   the about paragraph uses, not a second font or a lighter cut.
+
+   line-height is fixed here, not by the script, and equals --dial-cell. That
+   is the whole no-layout-shift story: the second line of the h1 is exactly
+   --dial-cell tall whether the dial was built or not.
+
+   font-kerning and ligatures are disabled so the plain string and the
+   per-character version measure identically. Splitting text into inline
+   blocks drops kerning pairs; turning kerning off for both makes the
+   enhanced and unenhanced headline the same width. */
+.hero-title .accent-word,
+.hero-title [data-dial] {
+  --dial-cell: 1.2em;
+
+  position: relative;
+  display: inline-block;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  color: var(--text-secondary);
+  font-kerning: none;
+  font-variant-ligatures: none;
+}
+
+.hero-aside {
+  display: grid;
+  gap: var(--s-5);
+  justify-items: start;
+}
+
+.hero-lede {
+  margin: 0;
+  max-width: 40ch;
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* ---- 4. The odometer dial -----------------------------------------------
+   Accessibility contract, in DOM order inside the <em>:
+
+     1. .dial-sr   the real string, visually hidden but present for assistive
+                   tech and for the clipboard.
+     2. .dial-vis  aria-hidden="true" and user-select: none, so it is neither
+                   announced nor copied.
+
+   An <h1> containing "A remembrance of" + this <em> is therefore announced
+   as "A remembrance of who I was., heading level 1", and Select All copies
+   exactly that string once, not once per glyph column.
+   -------------------------------------------------------------------------- */
+
+.dial-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dial-vis {
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: var(--dial-cell);
+}
+
+/* One character mask. vertical-align: top (not baseline) is required: an
+   inline-block with overflow: hidden takes its bottom margin edge as its
+   baseline, which would drop every mask by a descender depth relative to the
+   spaces between words and make the line box taller than --dial-cell. With
+   every mask and the strut on the same --dial-cell leading, the line box is
+   exactly --dial-cell and the glyph baselines line up on their own. */
+.dial-ch {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  height: var(--dial-cell);
+  line-height: var(--dial-cell);
+  overflow: hidden;
+}
+
+/* Punctuation never rolls: it renders immediately, keeps its natural width,
+   and drops the mask so a comma's tail can never be clipped. */
+.dial-ch.is-still { overflow: visible; }
+
+/* In-flow, invisible copy of the FINAL glyph. This is the element that gives
+   the mask its width, which is why a wide decoy glyph in the column above
+   cannot widen the word. */
+.dial-sizer { visibility: hidden; }
+
+/* The rolling column, out of flow on top of the sizer. width: 100% pins it to
+   the mask, and centred rows mean an over-wide decoy is clipped evenly on
+   both sides instead of losing its right half. The final glyph is exactly as
+   wide as the mask, so centring lands it precisely on the sizer. */
+.dial-col {
+  --dial-y: calc(var(--dial-n) * var(--dial-cell) * -1);
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+
+  /* The resting state already shows the final glyph. If the animation is
+     absent (reduced motion, no CSS animation support) or finished, the word
+     is simply correct. */
+  transform: translate3d(0, var(--dial-y), 0);
+
+  animation-name: var(--dial-anim);
+  animation-timing-function: linear;
+  animation-fill-mode: backwards;
+}
+
+.dial-col > span {
+  display: block;
+  height: var(--dial-cell);
+  line-height: var(--dial-cell);
+  text-align: center;
+}
+
+/* --dial-y is negative, so subtracting from it travels further up: the column
+   overruns its final glyph by 0.1em at 74% and eases back down onto it. That
+   is the settle. Per-character duration and stagger delay are inline, written
+   once at build time by hero.js. */
+@keyframes hero-dial-roll {
+  0% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: var(--ease-spring);
+  }
+  74% {
+    transform: translate3d(0, calc(var(--dial-y) - 0.1em), 0);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    transform: translate3d(0, var(--dial-y), 0);
+  }
+}
+
+
+/* ---- 5. Actions --------------------------------------------------------- */
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+/* ---- 6. The affordance hint --------------------------------------------- */
+
+/* This is the only thing telling a visitor the hero is a toy, so it is
+   removed entirely (not just faded) whenever the terrain is not reactive. */
+.hero-hint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.hero-hint kbd {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1;
+  padding: 0.3em 0.5em;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+/* ---- 7. Entrance -------------------------------------------------------- */
+
+/* Terrain contours draw themselves in from low to high elevation over 900ms
+   (hero.js). The rows surface first as a faint ground, the headline lands
+   next with the dial rolling inside it, and the supporting copy resolves
+   after, on the long exponential settle the whole page shares. */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes hero-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="reduced"]) .hero {
+    --hero-anim: hero-rise;
+    --hero-fade-anim: hero-fade;
+    --marquee-anim: hero-marquee;
+    --dial-anim: hero-dial-roll;
+  }
+}
+
+html[data-motion="full"] .hero {
+  --hero-anim: hero-rise;
+  --hero-fade-anim: hero-fade;
+  --marquee-anim: hero-marquee;
+  --dial-anim: hero-dial-roll;
+}
+
+.hero-eyebrow,
+.hero-title,
+.hero-lede,
+.hero-actions,
+.hero-hint,
+.hero-down {
+  animation-name: var(--hero-anim);
+  animation-duration: var(--dur-reveal);
+  animation-timing-function: var(--ease-expo);
+  animation-fill-mode: both;
+}
+
+/* The rows only fade: a rising 13rem outline
+   reads as the page jumping. */
+.marquee {
+  animation-name: var(--hero-fade-anim, none);
+  animation-duration: 1400ms;
+  animation-timing-function: var(--ease-expo);
+  animation-fill-mode: both;
+}
+
+.marquee--reverse { animation-delay: 120ms; }
+.hero-title       { animation-delay: 340ms; }
+.hero-eyebrow     { animation-delay: 420ms; }
+.hero-lede        { animation-delay: 520ms; }
+.hero-actions     { animation-delay: 620ms; }
+.hero-hint        { animation-delay: 760ms; }
+.hero-down        { animation-delay: 880ms; }
+
+/* ---- 8. Reduced motion -------------------------------------------------- */
+
+/* hero.js paints one static frame and detaches every pointer listener, so
+   the hint would be advertising an interaction that
+   no longer exists. The three animation switches are already `none` outside
+   the rules above, which leaves the rows still and every glyph column resting
+   on its final letter. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) .hero-hint { display: none; }
+  .hero-canvas { transition: none; }
+}
+
+html[data-motion="reduced"] .hero-hint { display: none; }
+html[data-motion="reduced"] .hero-canvas { transition: none; }
+
+/* ---- 9. Narrow viewports ------------------------------------------------ */
+
+@media (max-width: 40rem) {
+  .hero {
+    row-gap: var(--s-5);
+    padding-block: calc(var(--hero-nav-h) + var(--s-3)) var(--s-6);
+  }
+
+  .hero-down { margin-block-start: var(--s-4); }
+
+  .hero-actions { gap: var(--s-2); }
+
+  .hero-actions > .btn { flex: 1 1 auto; }
+}
+
+/* Short landscape viewports (phones on their side, split-screen tablets):
+   the hero must not force a scroll just to reach the buttons. */
+@media (max-height: 34rem) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding-block: calc(var(--hero-nav-h) + var(--s-3)) var(--s-6);
+  }
+  .hero-hint,
+  .hero-down { display: none; }
+}

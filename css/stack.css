@@ -1,0 +1,317 @@
+/* ==========================================================================
+   stack.css — scroll-driven card stacking
+   --------------------------------------------------------------------------
+   Cards marked [data-stack-item] stick below the nav and pile up. As the next
+   card rises to cover one, the covered card recedes: it scales down, its
+   content fades toward the page background, and the card riding over it casts
+   a shadow onto the sliver that is still showing. The pile reads as physical
+   depth rather than flat overlap.
+
+   PROPERTY CONTRACT (shared with css/tilt.css — do not break it)
+   --------------------------------------------------------------------------
+   This file owns, on [data-stack-item]:
+       position: sticky | top | scale | box-shadow | background-color
+       the ::after scrim (and its opacity)
+       every --stack-* custom property
+   This file must NEVER write, on [data-stack-item]:
+       transform | rotate | translate      <- owned by css/tilt.css
+   `scale` is the individual transform property, not the transform shorthand,
+   so it composes independently with tilt's `rotate`/`translate` and with the
+   `transform: translate3d(...)` that main.css uses for [data-reveal].
+
+   `filter` is granted to this module but deliberately left UNUSED: a non-none
+   filter forces `transform-style: flat` on the element, which would flatten
+   any 3D layering the tilt module sets up on the blog cards. The dimming is
+   done with an ::after scrim instead, which is cheaper and 3D-safe.
+
+   Every value below comes from css/tokens.css. Nothing here restates the card
+   styling in css/main.css: radius, border and padding stay where they are.
+
+   Paired with js/stack.js, which measures geometry and drives progress.
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   1  Registered custom properties
+
+   Registration buys two things that plain custom properties cannot do:
+     - <number> properties interpolate, so the CSS scroll-driven path can
+       animate --stack-depth / --stack-cover in keyframes;
+     - <length> properties compute to resolved px, so js/stack.js can read
+       --stack-top straight off the root instead of re-deriving nav height.
+   initial-value must be computationally independent, hence px and not rem.
+   -------------------------------------------------------------------------- */
+
+/* Inherited, because the scrim in section 5 is a ::after pseudo-element and a
+   pseudo-element can only see this value by inheriting it from its
+   originating card. --stack-cover is read on the card itself, so it does not
+   need to travel. */
+@property --stack-depth {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --stack-cover {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --stack-top {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 72px;
+}
+
+@property --stack-lift {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+
+/* --------------------------------------------------------------------------
+   2  Dials
+
+   --stack-top    where the first card comes to rest. --nav-h is published by
+                  css/main.css; the 4.5rem fallback keeps this file standalone.
+   --stack-fan    how much of each buried card stays visible under the card
+                  above it. js/stack.js adds the scale compensation on top of
+                  this per card, so this is the true visible sliver, not a
+                  raw offset.
+   --stack-scale  total scale reduction at full burial. Brief allows 0.04-0.08.
+   --stack-dim    peak opacity of the scrim that fades a buried card toward
+                  the page background.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --stack-top: calc(var(--nav-h, 4.5rem) + var(--s-5));
+  --stack-fan: 6px;
+  --stack-scale: 0.055;
+  --stack-dim: 0.55;
+
+  /* Cast shadow, at full coverage. Offsets are negative on Y because the
+     shadow is thrown UPWARD, onto the sliver of the card underneath. */
+  --stack-shadow-y: -5px;
+  --stack-shadow-blur: 26px;
+  --stack-shadow-spread: -6px;
+  --stack-shadow-alpha: 0.5;
+}
+
+
+/* --------------------------------------------------------------------------
+   3  Resting state
+
+   `top` is declared unconditionally, even while the card is static, so that
+   js/stack.js can resolve the sticky offset without the card being sticky yet.
+   --stack-lift carries the per-card compensation described in section 2.
+   -------------------------------------------------------------------------- */
+
+[data-stack-item] {
+  top: calc(var(--stack-top) + var(--stack-lift, 0px));
+}
+
+
+/* --------------------------------------------------------------------------
+   4  Stacking on
+
+   js/stack.js sets [data-stack="on"] on <html> once it has confirmed the
+   viewport is large enough, motion is allowed, and at least two cards in a
+   group actually fit on screen. Until then nothing below applies and the
+   cards are ordinary blocks, which is also the no-JS state.
+   -------------------------------------------------------------------------- */
+
+:root[data-stack="on"] .stack-card {
+  position: sticky;
+
+  /* A pile of translucent cards is not a pile: you would read the buried
+     card's text through the one on top of it. --bg-elevated is the token for
+     a surface lifted off the page, and composites to within a shade of what
+     --surface over --bg already renders, so the cards keep their colour. */
+  background-color: var(--bg-elevated);
+
+  /* Hover and focus fills from main.css are translucent, so they cannot be
+     used directly here. They are re-applied as a tint layered ON TOP of the
+     opaque base instead, which preserves the lift without the transparency. */
+  /* Exposed as a layer so a module that also paints a background-image on
+     these cards (css/tilt.css does, for its glare) can compose with the tint
+     instead of replacing it. Applied here too, so this file stands alone. */
+  --stack-tint-layer: linear-gradient(
+    var(--stack-tint, transparent),
+    var(--stack-tint, transparent)
+  );
+  background-image: var(--stack-tint-layer);
+
+  will-change: scale;
+}
+
+:root[data-stack="on"] .stack-card:hover,
+:root[data-stack="on"] .stack-card:focus-within {
+  --stack-tint: var(--surface);
+}
+
+/* Single-column grid containers confine a sticky child to its own grid area,
+   where it has nowhere to travel. A flex column gives the child the whole
+   container as its containing block. js/stack.js only marks a parent when it
+   has measured it as a genuine single column, so the geometry is unchanged. */
+:root[data-stack="on"] [data-stack-group] {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* --------------------------------------------------------------------------
+   5  Depth
+
+   Two progress values, both 0 at rest and 1 at full coverage, both covering
+   the same scroll window for a given pair of cards:
+
+     --stack-depth  on the card being buried   -> it recedes
+     --stack-cover  on the card riding over it -> it casts
+
+   Section 6 (CSS scroll-driven) and js/stack.js (rAF fallback) are the two
+   things that write them. Everything visual is derived here, once.
+   -------------------------------------------------------------------------- */
+
+/* Scaled about the default centre origin: transform-origin is left alone
+   because the tilt module pivots its rotation around it. js/stack.js widens
+   each card's sticky offset to absorb the resulting half-height shift, so
+   the visible sliver stays exactly --stack-fan tall. */
+:root[data-stack="on"] .stack-card--buries {
+  scale: calc(1 - var(--stack-depth) * var(--stack-scale));
+}
+
+/* The scrim sits over the padding box, so the card's border stays crisp while
+   its content sinks toward the page background. Tinting with --bg rather than
+   with black means this reads correctly in both themes: the card recedes
+   toward whatever the page is, dark or light. */
+:root[data-stack="on"] .stack-card--buries::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  border-radius: inherit;
+  background-color: var(--bg);
+  opacity: calc(var(--stack-depth) * var(--stack-dim));
+  pointer-events: none;
+}
+
+/* The card above casts onto the card below. The shadow is thrown upward,
+   into the sliver that is still showing, because a downward shadow would be
+   painted over by the very card it is meant to fall on. */
+:root[data-stack="on"] .stack-card--covers {
+  box-shadow:
+    0
+    calc(var(--stack-cover) * var(--stack-shadow-y))
+    calc(var(--stack-cover) * var(--stack-shadow-blur))
+    calc(var(--stack-cover) * var(--stack-shadow-spread))
+    rgb(0 0 0 / calc(var(--stack-cover) * var(--stack-shadow-alpha)));
+}
+
+
+/* --------------------------------------------------------------------------
+   6  CSS scroll-driven path (preferred)
+
+   A scroll() timeline takes its animation-range in raw scroll offsets, which
+   is what makes this exact rather than approximate: js/stack.js already knows
+   the two scroll positions that bound each card's burial, and writes them
+   inline as `animation-range`. The browser then runs the whole effect on its
+   own animation engine with no scroll listener involved at all.
+
+   A view() timeline cannot do this job: once a card sticks, its box stops
+   moving through the scrollport and its view progress stalls. Support for
+   both ships together, so js/stack.js feature-detects `animation-timeline:
+   view()` exactly as the brief specifies, and uses scroll() to drive it.
+
+   animation-name and animation-range are set inline, per card, by JS.
+   -------------------------------------------------------------------------- */
+
+@keyframes stack-bury {
+  from { --stack-depth: 0; }
+  to   { --stack-depth: 1; }
+}
+
+@keyframes stack-cover {
+  from { --stack-cover: 0; }
+  to   { --stack-cover: 1; }
+}
+
+:root[data-stack="on"][data-stack-mode="css"] .stack-card {
+  animation-timeline: scroll(root block);
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-duration: auto;
+  animation-iteration-count: 1;
+}
+
+
+/* --------------------------------------------------------------------------
+   7  Off switches
+
+   js/stack.js is the authority: it watches the same two media queries and the
+   site's own motion toggle, and drops [data-stack="on"] when any of them says
+   stop. The blocks below are a safety net for the case where the attribute is
+   somehow still set, so they use !important to beat section 5 — the same
+   approach main.css already takes in its reduced-motion block.
+   -------------------------------------------------------------------------- */
+
+/* Narrow or short viewports. A tall pile on a phone buries the content and
+   leaves nothing to scroll to, so the cards simply flow. Matches the
+   MIN_WIDTH / MIN_HEIGHT queries in js/stack.js. */
+@media (max-width: 47.999em), (max-height: 39.999em) {
+  :root[data-stack="on"] .stack-card {
+    position: static !important;
+    scale: 1 !important;
+    box-shadow: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  :root[data-stack="on"] .stack-card--buries::after {
+    opacity: 0 !important;
+  }
+}
+
+/* OS-level reduced motion, and the site's own [data-motion] toggle. Both
+   disable the effect outright: static cards, full scale, no sticky. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-stack="on"] .stack-card {
+    position: static !important;
+    scale: 1 !important;
+    box-shadow: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  :root[data-stack="on"] .stack-card--buries::after {
+    opacity: 0 !important;
+  }
+}
+
+:root[data-motion="reduced"][data-stack="on"] .stack-card {
+  position: static !important;
+  scale: 1 !important;
+  box-shadow: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+
+:root[data-motion="reduced"][data-stack="on"] .stack-card--buries::after {
+  opacity: 0 !important;
+}
+
+/* Printing a pile of cards stuck to a viewport that does not exist on paper
+   would drop every card but the last. */
+@media print {
+  :root[data-stack="on"] .stack-card {
+    position: static !important;
+    scale: 1 !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  :root[data-stack="on"] .stack-card--buries::after {
+    opacity: 0 !important;
+  }
+}

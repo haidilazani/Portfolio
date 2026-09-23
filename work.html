@@ -1,142 +1,354 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark" data-motion="full">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aidil Azani – Work</title>
-    <meta name="description" content="Selected work and projects by Aidil Azani.">
+
+    <title>Work - Aidil Azani</title>
+    <meta name="description"
+        content="Three projects with real links: GeoTour, a semantic tourism search engine in Flask; this hand-written portfolio; and a raw-WebGL front-end study. Plus where I have worked.">
+
+    <!-- Seed theme + motion before first paint so neither flashes. -->
     <script>
         (function () {
-            var t; try { t = localStorage.getItem('theme'); } catch (e) { }
-            document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            var t, m; try { t = localStorage.getItem('theme'); m = localStorage.getItem('motion'); } catch (e) { }
+            var d = document.documentElement;
+            d.className = d.className.replace(/\bno-js\b/, 'js');
+            d.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            d.setAttribute('data-motion', m === 'reduced' ? 'reduced' : 'full');
         })();
     </script>
-    <link rel="stylesheet" href="css/portfolio.css">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#060607" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/stack.css">
+
+    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/work.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Aidil Azani">
+    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/work.html">
+    <meta property="og:title" content="Work - Aidil Azani">
+    <meta property="og:description"
+        content="Three projects with real links: a semantic tourism search engine in Flask, this hand-written portfolio, and a raw-WebGL front-end study.">
+    <meta property="og:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:image:alt" content="Aidil Azani">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@aidilazani">
+    <meta name="twitter:creator" content="@aidilazani">
+    <meta name="twitter:title" content="Work - Aidil Azani">
+    <meta name="twitter:description"
+        content="Three projects with real links: a semantic tourism search engine in Flask, this hand-written portfolio, and a raw-WebGL front-end study.">
+    <meta name="twitter:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Aidil Azani",
+      "url": "https://haidilazani.github.io/Portfolio/",
+      "inLanguage": "en",
+      "author": { "@type": "Person", "name": "Aidil Azani" }
+    }
+    </script>
 </head>
 
 <body>
 
-    <header class="site-nav">
-        <nav class="glass-nav" aria-label="Main navigation">
-            <a href="index.html" class="nav-logo">aidil<span>.</span></a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav" data-nav>
+        <nav class="nav-inner" aria-label="Primary">
+            <a class="nav-logo" href="index.html">aidil<span>.</span></a>
             <ul class="nav-links">
                 <li class="nav-indicator" aria-hidden="true"></li>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="work.html" aria-current="page">Work</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="work.html">Work</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="memory.html">Memory</a></li>
+                <li><a href="blog.html">Writing</a></li>
+                <li><a href="photography.html">Photography</a></li>
             </ul>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark / light mode">
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path
-                        d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41">
-                    </path>
-                </svg>
-            </button>
+            <div class="nav-actions">
+                <button class="cmdk-trigger" type="button" data-cmdk-open>Search <kbd>&#8984;K</kbd></button>
+                <button class="icon-btn" type="button" data-motion-toggle aria-pressed="false"
+                    aria-label="Toggle reduced motion">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M3 12h3.2l2.6-7 4.4 14 2.6-7H21" />
+                    </svg>
+                </button>
+                <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false"
+                    aria-label="Toggle colour theme">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+                    </svg>
+                </button>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <main id="main">
 
-        <section class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Work</span>
-                <h1 class="section-title">Things I've built.</h1>
-                <p class="section-subtitle">A collection of projects across web development, client work and
-                    academic research — each one a small piece of the search.</p>
-            </div>
+        <!-- ================================================================
+             Case studies
+             ================================================================ -->
+        <section class="section">
+            <div class="container">
 
-            <div class="card-grid">
-                <a href="#" target="_blank" rel="noopener" class="glass-card reveal">
-                    <div class="card-thumb thumb-a">aidil.</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Personal</span><span class="dot"></span><span>2026</span></div>
-                        <h3>Personal Portfolio</h3>
-                        <p>This very site. A minimalist, liquid-glass portfolio with dark and light modes, smooth
-                            page transitions and zero frameworks — just HTML, CSS and vanilla JavaScript, hosted
-                            on GitHub Pages.</p>
-                        <div class="card-tags">
-                            <span class="tag">HTML</span>
-                            <span class="tag">CSS</span>
-                            <span class="tag">JavaScript</span>
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h1 class="section-title">The <em class="accent-word">evidence.</em></h1>
+                    <p class="section-sub">Three projects, in the order I would defend them. Every one of them
+                        opens: two run in your browser, the third is source you can read. Where I cannot yet prove
+                        an outcome, I have not written one.</p>
+                </div>
+
+                <!-- GeoTour is source-only: no hosted demo yet, and no measured
+                     result to state, so this case study deliberately ends at
+                     Approach rather than claiming an Outcome. -->
+                <article class="case" data-stack-item data-reveal style="--reveal-i: 1">
+                    <p class="case-label">2026 &#183; Final-year project, Flask + NLP</p>
+                    <h2 class="case-title">GeoTour, a semantic tourism recommendation system</h2>
+                    <p class="case-lede">A travel search engine that understands &#8220;quiet mountain ruins&#8221;
+                        instead of matching keywords: BERT embeddings over a 1,155-site UNESCO World Heritage
+                        dataset, plus an ontology graph you can explore.</p>
+
+                    <div class="case-grid">
+                        <div class="case-block" data-label="Problem">
+                            <p>Keyword search fails travellers who describe the feeling of a place rather than its
+                                name, and destination datasets carry rich category metadata that plain text matching
+                                throws away.</p>
                         </div>
-                        <span class="card-link text-link">View on GitHub <span>→</span></span>
+                        <div class="case-block" data-label="Approach">
+                            <p>A Flask + SQLAlchemy app encodes each point of interest as a rich document (name,
+                                ontology categories, description) with the all-MiniLM-L6-v2 sentence transformer,
+                                ranks queries by cosine similarity, filters by country names detected in the query,
+                                and ships a second Flask app that renders the category ontology as an interactive
+                                graph with a spreading-activation search (0.5 decay, up to 6 hops).</p>
+                        </div>
                     </div>
-                </a>
 
-                <a href="#" target="_blank" rel="noopener" class="glass-card reveal reveal-delay-1">
-                    <div class="card-thumb thumb-b">JS</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Client Work</span><span class="dot"></span><span>2023–24</span>
-                        </div>
-                        <h3>JustSimple Client Sites</h3>
-                        <p>Frontend development at JustSimple Sdn. Bhd — building and maintaining responsive
-                            client websites, turning briefs and mockups into polished pages.</p>
-                        <div class="card-tags">
-                            <span class="tag">WordPress</span>
-                            <span class="tag">Elementor</span>
-                            <span class="tag">CSS</span>
-                        </div>
-                        <span class="card-link text-link">Learn more <span>→</span></span>
-                    </div>
-                </a>
+                    <ul class="project-stack">
+                        <li class="tag">Python</li>
+                        <li class="tag">Flask</li>
+                        <li class="tag">SQLAlchemy</li>
+                        <li class="tag">sentence-transformers (BERT, all-MiniLM-L6-v2)</li>
+                        <li class="tag">NetworkX</li>
+                        <li class="tag">pandas</li>
+                        <li class="tag">NumPy</li>
+                        <li class="tag">SQLite / PostgreSQL</li>
+                        <li class="tag">Jinja</li>
+                        <li class="tag">JavaScript</li>
+                    </ul>
 
-                <a href="#" target="_blank" rel="noopener" class="glass-card reveal reveal-delay-2">
-                    <div class="card-thumb thumb-c">ML</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Academic</span><span class="dot"></span><span>Ongoing</span></div>
-                        <h3>Data Science Projects</h3>
-                        <p>Coursework and final-year research at UiTM Shah Alam — data analysis and machine
-                            learning experiments in Python, from notebooks to presentations.</p>
-                        <div class="card-tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">Machine Learning</span>
-                        </div>
-                        <span class="card-link text-link">Learn more <span>→</span></span>
+                    <div class="project-links">
+                        <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/FYP-1"
+                            target="_blank" rel="noopener">Read the source</a>
                     </div>
-                </a>
+                </article>
 
-                <a href="#" target="_blank" rel="noopener" class="glass-card reveal reveal-delay-3">
-                    <div class="card-thumb thumb-d">&lt;/&gt;</div>
-                    <div class="card-body">
-                        <div class="card-meta"><span>Freelance</span><span class="dot"></span><span>2022–23</span></div>
-                        <h3>Freelance Web Projects</h3>
-                        <p>Early freelance work as a junior developer — small business sites and landing pages
-                            that taught me how to ship for real clients.</p>
-                        <div class="card-tags">
-                            <span class="tag">HTML</span>
-                            <span class="tag">CSS</span>
-                            <span class="tag">JavaScript</span>
+                <!-- This portfolio: linkState "live". -->
+                <article class="case" data-stack-item data-reveal style="--reveal-i: 2">
+                    <p class="case-label">2026 &#183; Personal site, vanilla web</p>
+                    <h2 class="case-title">This portfolio</h2>
+                    <p class="case-lede">Six pages, 9,950 lines, 103 KB gzipped of hand-written HTML, CSS and JavaScript: no
+                        framework, no bundler, no dependencies, including a topographic contour background drawn
+                        with marching squares.</p>
+
+                    <div class="case-grid">
+                        <div class="case-block" data-label="Problem">
+                            <p>I wanted a portfolio I fully understood: no framework whose behaviour I couldn't
+                                explain in an interview, and nothing a recruiter's phone would have to download a
+                                megabyte of JavaScript to read.</p>
                         </div>
-                        <span class="card-link text-link">Learn more <span>→</span></span>
+                        <div class="case-block" data-label="Approach">
+                            <p>Everything is written by hand: a theme toggle that sets data-theme before first paint
+                                to avoid a flash, a liquid nav indicator, scroll-reveal, a command
+                                palette and page transitions in one dependency-free script, and a canvas background
+                                that generates two value-noise fields, cross-fades them to make the terrain breathe,
+                                and traces five to nine elevation contours per frame with marching squares. Taps still
+                                ripple on touch; anyone who prefers reduced motion gets a single static render.</p>
+                        </div>
+                        <div class="case-block" data-label="Outcome">
+                            <p>Live on GitHub Pages (HTTP 200) with zero dependencies and zero build step; total
+                                HTML+CSS+JS payload is 393 KB uncompressed, 103 KB gzipped, across 16 files.</p>
+                        </div>
                     </div>
-                </a>
+
+                    <ul class="project-stack">
+                        <li class="tag">HTML</li>
+                        <li class="tag">CSS (custom properties)</li>
+                        <li class="tag">JavaScript (ES6)</li>
+                        <li class="tag">Canvas 2D</li>
+                        <li class="tag">GitHub Pages</li>
+                    </ul>
+
+                    <div class="project-links">
+                        <a class="pill-link pill-link--live" href="https://haidilazani.github.io/Portfolio/"
+                            target="_blank" rel="noopener">Open the live site</a>
+                        <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/Portfolio"
+                            target="_blank" rel="noopener">Read the source</a>
+                    </div>
+                </article>
+
+                <!-- Buttermax: linkState "live". -->
+                <article class="case" data-stack-item data-reveal style="--reveal-i: 3">
+                    <p class="case-label">2026 &#183; Front-end study, raw WebGL</p>
+                    <h2 class="case-title">Buttermax, a WebGL design study</h2>
+                    <p class="case-lede">A four-page, dependency-free reinterpretation of an Awwwards-winning studio
+                        site, including a hand-written fragment shader with fbm domain warping and a Lenis-style
+                        inertia scroller, built to learn how that class of site is made.</p>
+
+                    <div class="case-grid">
+                        <div class="case-block" data-label="Problem">
+                            <p>Award-winning WebGL sites hide how they work behind minified bundles and proprietary
+                                engines, so the only way to learn the interaction language is to rebuild it.</p>
+                        </div>
+                        <div class="case-block" data-label="Approach">
+                            <p>Rebuilt the architecture and interaction vocabulary from scratch in plain HTML, CSS
+                                and JS: a raw-WebGL liquid shader with no Three.js, a custom smooth scroller that
+                                preserves the native scrollbar and accessibility, a custom cursor, preloader, scroll
+                                reveals, velocity-reactive marquees and cursor-following project previews, with no
+                                CDN calls, so it runs fully offline.</p>
+                        </div>
+                        <div class="case-block" data-label="Outcome">
+                            <p>Live on GitHub Pages (HTTP 200), four pages, ~76 KB of HTML/CSS/JS, and a README that
+                                states plainly that it is an unaffiliated study with placeholder assets, not a copy.
+                            </p>
+                        </div>
+                    </div>
+
+                    <ul class="project-stack">
+                        <li class="tag">JavaScript</li>
+                        <li class="tag">WebGL / GLSL</li>
+                        <li class="tag">HTML</li>
+                        <li class="tag">CSS</li>
+                        <li class="tag">GitHub Pages</li>
+                    </ul>
+
+                    <div class="project-links">
+                        <a class="pill-link pill-link--live" href="https://haidilazani.github.io/Assignment/"
+                            target="_blank" rel="noopener">Open the live site</a>
+                        <a class="pill-link pill-link--repo" href="https://github.com/haidilazani/Assignment"
+                            target="_blank" rel="noopener">Read the source</a>
+                    </div>
+                </article>
+
             </div>
         </section>
 
-        <!-- CTA -->
-        <section class="container">
-            <div class="section-head centered reveal">
-                <h2 class="section-title">Have a project in mind?</h2>
-                <p class="section-subtitle">Let's turn a small talk into something real.</p>
-                <a href="index.html#contact" class="btn btn-primary">Let's talk</a>
+        <!-- ================================================================
+             Experience — work with no linkable artifact lives here, not
+             as a project card pretending to have a URL.
+             ================================================================ -->
+        <section class="section" id="experience">
+            <div class="container">
+
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Experience</h2>
+                    <p class="section-sub">Jobs rather than artifacts. None of this client work has a public link I
+                        can hand you, so it sits here instead of pretending to be a project card.</p>
+                </div>
+
+                <ol class="timeline">
+                    <li class="timeline-item" data-reveal style="--reveal-i: 1">
+                        <p class="timeline-when">Present</p>
+                        <h3 class="timeline-org">UiTM Shah Alam</h3>
+                        <p class="timeline-role">Computer Science student</p>
+                        <p class="timeline-detail">Degree coursework spanning data science, machine learning and
+                            software engineering. Final-year project: GeoTour, a semantic tourism recommendation
+                            system built in Flask with BERT sentence embeddings and an ontology graph.</p>
+                    </li>
+                    <li class="timeline-item" data-reveal style="--reveal-i: 2">
+                        <p class="timeline-when">2023 - 2024</p>
+                        <h3 class="timeline-org">JustSimple Sdn. Bhd.</h3>
+                        <p class="timeline-role">Frontend Developer</p>
+                        <p class="timeline-detail">Built and maintained client websites: turning briefs and mockups
+                            into responsive pages in WordPress and Elementor, and writing the custom CSS for
+                            everything the page builder couldn't do.</p>
+                    </li>
+                    <li class="timeline-item" data-reveal style="--reveal-i: 3">
+                        <p class="timeline-when">2022 - 2023</p>
+                        <h3 class="timeline-org">Freelance</h3>
+                        <p class="timeline-role">Junior Developer</p>
+                        <p class="timeline-detail">Small client projects: business sites and landing pages. First
+                            lessons in scope, revisions, and how shipped code differs from classroom code.</p>
+                    </li>
+                </ol>
+
             </div>
         </section>
+
+        <!-- ================================================================
+             CTA
+             ================================================================ -->
+        <section class="section">
+            <div class="container">
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Open to internships <em class="accent-word">and freelance.</em></h2>
+                    <p class="section-sub">Malaysia or remote. I am based in Shah Alam, Selangor.</p>
+                    <p class="section-foot"><a class="btn btn-primary" href="index.html#contact" data-magnetic>Get in
+                            touch</a></p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer>
-        &copy; 2026 Aidil Azani. All rights reserved.
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p class="footer-brand"><a href="index.html">aidil<span>.</span></a></p>
+            <nav class="footer-links" aria-label="Footer">
+                <a href="work.html">Work</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Writing</a>
+                <a href="photography.html">Photography</a>
+                <a href="mailto:haidilazani@gmail.com">Email</a>
+            </nav>
+            <p class="footer-meta">&copy; 2026 Aidil Azani. Written by hand in HTML, CSS and JavaScript. No
+                dependencies, no build step.</p>
+        </div>
     </footer>
 
-    <script src="js/navbar.js"></script>
+    <!-- Command palette -->
+    <div class="cmdk" data-cmdk hidden>
+        <div class="cmdk-panel" aria-label="Search this site">
+            <input class="cmdk-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Search pages, projects and writing" aria-label="Search pages, projects and writing">
+            <ul class="cmdk-list">
+                <li><a class="cmdk-item" href="work.html">Work</a></li>
+                <li><a class="cmdk-item" href="about.html">About</a></li>
+                <li><a class="cmdk-item" href="blog.html">Writing</a></li>
+                <li><a class="cmdk-item" href="photography.html">Photography</a></li>
+                <li><a class="cmdk-item" href="index.html#contact">Contact</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani/FYP-1" target="_blank"
+                        rel="noopener">GeoTour source</a></li>
+                <li><a class="cmdk-item" href="https://haidilazani.github.io/Assignment/" target="_blank"
+                        rel="noopener">Buttermax study</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani" target="_blank"
+                        rel="noopener">GitHub</a></li>
+                <li><a class="cmdk-item" href="mailto:haidilazani@gmail.com">Email Aidil</a></li>
+            </ul>
+            <p class="cmdk-empty" hidden>Nothing matches that.</p>
+        </div>
+    </div>
+
+    <script src="js/app.js" defer></script>
+    <script src="js/stack.js" defer></script>
 </body>
 
 </html>

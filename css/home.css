@@ -1,0 +1,992 @@
+/* ==========================================================================
+   home.css - the home page below the hero (index.html only)
+   --------------------------------------------------------------------------
+   Layout and heading language after litup.fr: strict full-width bands that
+   alternate between the theme's own ground and its inverse, Jost as the
+   display face (the free stand-in for Futura), tiny stacked uppercase
+   labels over a rule, two-line bold titles, outlined decorative words, and
+   greyscale photographs that regain their colour under the pointer.
+
+   Sections, in order, and their band:
+     hero       base      css/hero.css
+     practice   base      the keyword roller + dash grid
+     work       inverse   sticky split per project, sliding outlined word
+     stats      base      outlined numbers with a falling echo, count-up
+     about      inverse   the paragraph that lights word by word
+     writing    base      the stacking cards (css/stack.css, css/tilt.css)
+     contact    inverse   big contact line, form, links
+     footer     inverse   link columns and the giant outlined wordmark
+
+   BANDS
+   .band paints the theme's own tokens. .band--invert re-points every colour
+   token at its --inv-* twin from css/tokens.css, so buttons, fields, tags,
+   cards, the focus ring and selection all flip inside it with no
+   per-component rule, in both themes.
+
+   SHAPE
+   One rule: things you press are round (buttons, pill links, the circular
+   scroll buttons); everything else is square (photographs, cards, tags,
+   fields). The site-wide radii stay untouched on every other page.
+
+   MOTION
+   Every effect here is driven by js/home.js and gated twice, on the OS
+   preference and on html[data-motion]. The default, script-free state of
+   every element is its final state.
+   ========================================================================== */
+
+
+/* ---- 1. Page scope ------------------------------------------------------ */
+
+/* Jost is the home page's display voice. Scoped to main and the footer so
+   the shared nav keeps the face it has on every other page. */
+.page-home main,
+.page-home .site-footer {
+  --font-display: var(--font-poster);
+}
+
+
+/* ---- 2. Bands ----------------------------------------------------------- */
+
+.band {
+  position: relative;
+  background-color: var(--bg);
+  color: var(--text);
+  transition:
+    background-color var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out);
+}
+
+.band--invert {
+  --bg:             var(--inv-bg);
+  --bg-elevated:    var(--inv-bg-elevated);
+  --bg-sunken:      var(--inv-bg-sunken);
+  --surface:        var(--inv-surface);
+  --surface-hover:  var(--inv-surface-hover);
+  --text:           var(--inv-text);
+  --text-secondary: var(--inv-text-secondary);
+  --text-tertiary:  var(--inv-text-tertiary);
+  --accent:         var(--inv-accent);
+  --accent-text:    var(--inv-accent-text);
+  --accent-soft:    var(--inv-accent-soft);
+  --border:         var(--inv-border);
+  --border-strong:  var(--inv-border-strong);
+  --danger:         var(--inv-danger);
+  --danger-text:    var(--inv-danger-text);
+  --danger-soft:    var(--inv-danger-soft);
+
+  color-scheme: var(--inv-scheme);
+}
+
+.practice,
+.work,
+.stats,
+.about,
+.writing,
+.contact {
+  padding-block: var(--section-y);
+}
+
+
+/* ---- 3. Shared pieces --------------------------------------------------- */
+
+/* The stacked uppercase label over a rule. Used once, as the work
+   section's real <h2>, so it is a heading and never a kicker above one. */
+.kicker {
+  margin: 0;
+  font-family: var(--font-poster);
+  font-size: var(--fs-kicker);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.kicker > span { display: block; }
+
+/* Two-line bold section titles. The accent phrase becomes an outline: the
+   same device as the marquee, the roller echo and the numbers, so the page
+   has one decorative idea rather than several. */
+.page-home .home-title {
+  font-family: var(--font-poster);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.page-home .home-title .accent-word {
+  display: inline-block;
+  font-weight: 500;
+  line-height: inherit;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+}
+
+@supports (-webkit-text-stroke: 1px) {
+  @media (min-width: 48em) {
+    .page-home .home-title .accent-word {
+      color: transparent;
+      -webkit-text-stroke: calc(var(--hairline) * 1.25) var(--text);
+    }
+  }
+}
+
+/* Circular drop button: a real link to the next anchor, 44px so it is a
+   usable target, drawn as a 1.5px ring like the reference. */
+.round-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  border: calc(var(--hairline) * 1.5) solid currentColor;
+  color: var(--text);
+  background-color: transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring),
+    scale var(--dur-fast) var(--ease-spring);
+}
+
+.round-btn svg {
+  transition: translate var(--dur-base) var(--ease-expo);
+}
+
+.round-btn:hover {
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+.round-btn:hover svg { translate: 0 2px; }
+.round-btn:active { scale: 0.94; }
+.round-btn:focus-visible { border-radius: 50%; }
+
+/* Square surfaces, round controls. */
+.page-home .tag,
+.page-home .post,
+.page-home .post-status {
+  border-radius: 0;
+}
+
+/* Greyscale photographs; colour returns under the pointer. */
+.work-frame img,
+.about-portrait img {
+  filter: grayscale(1) contrast(1.04);
+  transition: filter var(--dur-slow) var(--ease-out);
+}
+
+.work-frame:hover img,
+.about-portrait:hover img {
+  filter: grayscale(0) contrast(1);
+}
+
+
+/* ---- 4. What I do: the keyword roller ----------------------------------- */
+
+.practice {
+  display: grid;
+  align-content: center;
+  min-height: min(52rem, 82svh);
+}
+
+.practice-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-8);
+  align-items: center;
+}
+
+@media (min-width: 56em) {
+  .practice-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    column-gap: var(--s-7);
+  }
+}
+
+/* Scattered 2px dashes on a 7 x 7 grid, placed as the reference places
+   them. One element, eleven background layers, no markup per dash.
+   Percent positions resolve as (box - dash) * p, so col/6 and row/6 land
+   each dash exactly on its cell. */
+.dash-grid {
+  --dash: linear-gradient(currentColor, currentColor);
+  --dash-size: calc(100% / 7) 2px;
+
+  width: 100%;
+  max-width: 30rem;
+  aspect-ratio: 1;
+  color: var(--text);
+  opacity: 0.9;
+  background-repeat: no-repeat;
+  background-size: var(--dash-size);
+  background-image:
+    var(--dash), var(--dash), var(--dash), var(--dash), var(--dash), var(--dash),
+    var(--dash), var(--dash), var(--dash), var(--dash), var(--dash);
+  background-position:
+    calc(100% * 2 / 6) 0%,
+    100% 0%,
+    50% calc(100% / 6),
+    calc(100% * 5 / 6) calc(100% / 6),
+    0% calc(100% * 2 / 6),
+    calc(100% * 2 / 6) calc(100% * 2 / 6),
+    100% calc(100% * 2 / 6),
+    calc(100% / 6) calc(100% * 5 / 6),
+    calc(100% * 5 / 6) calc(100% * 5 / 6),
+    0% 100%,
+    100% 100%;
+}
+
+@media (max-width: 55.99em) {
+  .dash-grid {
+    max-width: 16rem;
+    aspect-ratio: 7 / 4;
+  }
+}
+
+.practice-body {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-6);
+}
+
+/* The wordmark riding the end of a long rule. */
+.practice-mark {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-3);
+  width: 100%;
+  margin: 0;
+}
+
+.practice-rule {
+  flex: 1;
+  height: 2px;
+  margin-block-end: 0.2em;
+  background-color: currentColor;
+}
+
+.practice-logo {
+  font-family: var(--font-poster);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.practice-logo > span { color: var(--accent-text); }
+
+/* The roller. One mask shows one cell; home.js steps --roll and both
+   columns travel the same distance, the echo 80ms behind, so the pair reads
+   as a word and its reflection turning over together. With no script, or
+   with motion off, --roll stays 0 and the first word simply sits there. */
+.roller {
+  --cell: 1.14em;
+  --roll: 0;
+
+  font-family: var(--font-poster);
+  font-size: var(--fs-roller);
+  font-weight: 500;
+  line-height: var(--cell);
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.roller-mask {
+  height: var(--cell);
+  overflow: clip;
+}
+
+.roller-col {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translate3d(0, calc(var(--roll) * var(--cell) * -1), 0);
+  transition: transform var(--dur-roll) var(--ease-expo);
+}
+
+.roller-col > li {
+  height: var(--cell);
+  margin: 0;
+}
+
+/* The echo: an outlined copy directly below, cut to its upper half and
+   fading out, like the word's own reflection on a dark floor. */
+.roller-mask--echo {
+  height: 0.56em;
+  margin-block-start: -0.1em;
+  color: var(--text-tertiary);
+  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+}
+
+.roller-mask--echo .roller-col { transition-delay: 80ms; }
+
+@supports (-webkit-text-stroke: 1px) {
+  .roller-mask--echo {
+    color: transparent;
+    -webkit-text-stroke: var(--hairline) var(--text);
+  }
+}
+
+/* Loop seam: home.js jumps back to the first cell with no transition. */
+.roller.is-snapping .roller-col { transition: none; }
+
+
+/* ---- 5. Selected work --------------------------------------------------- */
+
+.work {
+  overflow-x: clip;
+}
+
+.work-intro {
+  display: grid;
+  gap: var(--s-4);
+  max-width: 22.5rem;
+}
+
+.work-sub {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.work-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+  padding-block-start: var(--s-9);
+}
+
+.work-item:first-of-type { padding-block-start: var(--s-7); }
+
+/* The rail: rule, title with counter, lede, stack, links, drop button. */
+.work-rail {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: var(--s-5);
+  justify-items: start;
+  align-content: start;
+  padding-block-start: var(--s-5);
+  border-block-start: 2px solid var(--text);
+}
+
+@media (min-width: 64em) {
+  .work-item {
+    grid-template-columns: minmax(0, 22.5rem) minmax(0, 1fr);
+    column-gap: clamp(var(--s-7), 5vw, var(--s-9));
+    align-items: start;
+  }
+
+  .work-rail {
+    position: sticky;
+    top: calc(var(--nav-h-compact) + var(--s-7));
+  }
+}
+
+.work-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-4);
+  width: 100%;
+}
+
+.work-title {
+  font-family: var(--font-poster);
+  font-size: var(--fs-title);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.work-count {
+  padding-block-end: 0.3em;
+  font-family: var(--font-poster);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.work-count b {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-home .work-rail .case-label {
+  color: var(--text-tertiary);
+}
+
+.work-lede {
+  max-width: 44ch;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.work-lede strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.work-rail .project-links { margin-block-start: 0; padding-block-start: 0; }
+
+/* The media column: photograph, caption, then the case detail. */
+.work-media {
+  display: grid;
+  gap: var(--s-7);
+  min-width: 0;
+}
+
+.work-figure {
+  --slide: 0.5;
+
+  position: relative;
+  margin: 0;
+}
+
+.work-frame-wrap { position: relative; }
+
+.work-frame {
+  --tilt-max: 4;
+  --tilt-lift: 0px;
+
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: clip;
+  background-color: var(--bg-sunken);
+}
+
+.work-frame picture,
+.work-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.work-frame img {
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+
+/* tilt.css paints its glare as the frame's own background-image, which the
+   photograph covers. Re-paint the same computed layer above the photo. */
+.work-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: inherit;
+  pointer-events: none;
+}
+
+.work-figure figcaption {
+  margin-block-start: var(--s-3);
+  font-family: var(--font-poster);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-align: end;
+  color: var(--text);
+}
+
+/* The sliding word. Two copies at identical coordinates: the outline sits
+   over the whole row, the filled copy lives inside the frame and is clipped
+   by it, so the word turns solid exactly where it crosses the photograph.
+   --slide (0 -> 1 as the figure crosses the viewport) comes from home.js;
+   its resting value 0.5 is also the reduced-motion position. */
+.slide-word {
+  position: absolute;
+  top: 58%;
+  left: 0;
+  z-index: 1;
+  font-family: var(--font-poster);
+  font-size: var(--fs-poster);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translate3d(calc(22vw - var(--slide) * (100% + 18vw)), -50%, 0);
+}
+
+/* Difference-blended paper: over a dark area of the photograph the letters
+   read light, over a light area they read dark, in either theme. */
+.slide-word--fill {
+  color: var(--paper);
+  mix-blend-mode: difference;
+}
+
+.slide-word--line {
+  color: transparent;
+  -webkit-text-stroke: var(--hairline) var(--text);
+}
+
+@supports not (-webkit-text-stroke: 1px) {
+  .slide-word--line { display: none; }
+}
+
+.work-figure.is-sliding .slide-word { will-change: transform; }
+
+.work-media .case-grid {
+  gap: var(--s-6) var(--s-7);
+}
+
+@media (max-width: 63.99em) {
+  .slide-word { font-size: var(--fs-mega); }
+}
+
+
+/* ---- 6. Numbers --------------------------------------------------------- */
+
+.stats {
+  overflow-x: clip;
+}
+
+.stats-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-9);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 56em) {
+  .stats-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-8);
+    row-gap: var(--s-10);
+  }
+
+  /* The right column rides a half-step lower, so the four read as a
+     descending line rather than a scoreboard. */
+  .stat:nth-child(even) { translate: 0 var(--s-10); }
+  .stats-list { padding-block-end: var(--s-10); }
+}
+
+.stat {
+  display: grid;
+  gap: var(--s-6);
+  align-content: start;
+}
+
+/* Sizer, number and echo share one grid cell. The hidden sizer carries the
+   final value, so the box never changes width while the count runs. */
+.stat-figure {
+  display: grid;
+  justify-self: start;
+  margin: 0;
+  font-family: var(--font-poster);
+  font-size: var(--fs-mega);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.stat-figure > span {
+  grid-area: 1 / 1;
+  justify-self: end;
+}
+
+.stat-sizer { visibility: hidden; }
+
+.stat-echo {
+  translate: 0 0.7em;
+  color: var(--text-tertiary);
+  -webkit-mask-image: linear-gradient(to bottom, black 12%, transparent 52%);
+  mask-image: linear-gradient(to bottom, black 12%, transparent 52%);
+  opacity: 0.7;
+}
+
+@supports (-webkit-text-stroke: 1px) {
+  .stat-num {
+    color: transparent;
+    -webkit-text-stroke: calc(var(--hairline) * 1.25) var(--text);
+  }
+
+  .stat-echo {
+    color: transparent;
+    -webkit-text-stroke: var(--hairline) var(--text);
+  }
+}
+
+.stat-label {
+  max-width: 28ch;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.stat-label strong {
+  font-family: var(--font-poster);
+  font-weight: 700;
+  color: var(--text);
+}
+
+
+/* ---- 7. About ----------------------------------------------------------- */
+
+.about-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+}
+
+@media (min-width: 64em) {
+  .about-split {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    column-gap: var(--s-9);
+    align-items: start;
+  }
+}
+
+.about-side {
+  display: grid;
+  gap: var(--s-6);
+  align-content: start;
+}
+
+.about-portrait {
+  width: 100%;
+  max-width: 20rem;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  overflow: clip;
+  background-color: var(--bg-sunken);
+}
+
+.about-portrait picture,
+.about-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.about-portrait img { object-fit: cover; }
+
+.about-main {
+  display: grid;
+  gap: var(--s-7);
+  justify-items: start;
+}
+
+.about-lead {
+  font-family: var(--font-poster);
+  font-size: var(--fs-prose-xl);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.about-lead strong { font-weight: 500; }
+
+/* home.js splits the paragraph into words and adds .is-scrubbing only when
+   motion is allowed. Unlit words sit at a faint grey and turn to ink as the
+   paragraph is read into view; key phrases are ink from the start. Opacity,
+   not colour, so the transition stays on the compositor. */
+.about-lead.is-scrubbing .hl-w {
+  opacity: 0.24;
+  transition: opacity 420ms var(--ease-out);
+}
+
+.about-lead.is-scrubbing .hl-w.is-lit,
+.about-lead.is-scrubbing strong .hl-w {
+  opacity: 1;
+}
+
+.about-main .section-foot { margin-block-start: 0; }
+
+
+/* ---- 8. Writing --------------------------------------------------------- */
+
+.writing-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+}
+
+@media (min-width: 64em) {
+  .writing-split {
+    grid-template-columns: minmax(0, 22.5rem) minmax(0, 1fr);
+    column-gap: clamp(var(--s-7), 5vw, var(--s-9));
+    align-items: start;
+  }
+
+  .writing .section-head {
+    position: sticky;
+    top: calc(var(--nav-h-compact) + var(--s-7));
+  }
+}
+
+.writing .section-head {
+  gap: var(--s-5);
+  margin: 0;
+  padding-block-start: var(--s-5);
+  border-block-start: 2px solid var(--text);
+}
+
+.writing .section-sub { font-size: var(--fs-base); }
+
+.writing .section-foot { margin-block-start: var(--s-4); }
+
+.page-home .post-list { gap: var(--s-5); }
+
+.page-home .post {
+  padding: var(--s-6);
+  border-color: var(--border-strong);
+}
+
+.page-home .post--planned {
+  padding-inline-start: calc(var(--s-6) + var(--s-4));
+}
+
+.page-home .post--planned::before {
+  inset-block: var(--s-6);
+  inset-inline-start: var(--s-6);
+}
+
+.page-home .post-title {
+  font-family: var(--font-poster);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+
+/* ---- 9. Contact --------------------------------------------------------- */
+
+.contact-head {
+  display: grid;
+  gap: var(--s-5);
+  margin-block-end: var(--s-8);
+}
+
+.page-home .contact-line {
+  font-size: var(--fs-display);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.page-home .contact-line .accent-word { font-weight: 500; }
+
+@supports (-webkit-text-stroke: 1px) {
+  @media (min-width: 48em) {
+    .page-home .contact-line .accent-word {
+      -webkit-text-stroke-width: calc(var(--hairline) * 1.5);
+    }
+  }
+}
+
+/* No boxes: the aside is a column under a rule, like the rails above. */
+.page-home .contact-aside {
+  padding: var(--s-5) 0 0;
+  border: 0;
+  border-block-start: 2px solid var(--text);
+  border-radius: 0;
+  background: none;
+}
+
+.page-home .contact-aside .btn-ghost {
+  padding-inline: 0;
+  font-size: var(--fs-base);
+}
+
+.page-home .contact-aside .btn-ghost:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--accent-text);
+}
+
+.page-home .social-links {
+  display: grid;
+  gap: 0;
+}
+
+.page-home .social-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  font-family: var(--font-poster);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.page-home .social-link::after { bottom: var(--s-2); }
+
+/* Underlined fields: square, transparent, one rule. The global focus ring
+   still draws round them; the rule turns accent while focused. */
+.page-home .field-input {
+  padding-inline: 0;
+  border-width: 0 0 var(--hairline);
+  border-color: var(--border-strong);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.page-home .field-input:hover { border-color: var(--text-tertiary); }
+
+.page-home .field-input:focus {
+  border-color: var(--accent);
+  background-color: transparent;
+}
+
+.page-home .field-label { color: var(--text); }
+
+
+/* ---- 10. Footer --------------------------------------------------------- */
+
+.page-home .site-footer {
+  margin-block-start: 0;
+  padding-block: 0;
+  border-block-start: 0;
+  overflow: clip;
+}
+
+/* The rule is drawn inside the gutters, so it lines up with every other
+   rule on the page instead of running to the container's padding edge. */
+.page-home .footer-inner {
+  gap: var(--s-6);
+  padding-block: var(--s-6) 0;
+  border-block-start: 0;
+  background-image: linear-gradient(var(--text), var(--text));
+  background-repeat: no-repeat;
+  background-position: var(--gutter) 0;
+  background-size: calc(100% - var(--gutter) * 2) 2px;
+}
+
+@media (min-width: 760px) {
+  .page-home .footer-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "meta  links"
+      "brand brand";
+    align-items: start;
+  }
+}
+
+.page-home .footer-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  column-gap: var(--s-8);
+  row-gap: 0;
+}
+
+.page-home .footer-links a {
+  font-family: var(--font-poster);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.page-home .footer-links a:hover { color: var(--accent-text); }
+
+.page-home .footer-meta {
+  max-width: 34ch;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* The giant outlined wordmark closes the page, its foot cut by the band's
+   bottom edge. Hover fills it. */
+.page-home .footer-brand {
+  margin: 0;
+  margin-block-end: -0.2em;
+  font-family: var(--font-poster);
+  font-size: var(--fs-wordmark);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.page-home .footer-brand a {
+  display: inline-block;
+  min-height: 0;
+  color: var(--text);
+  transition: color var(--dur-slow) var(--ease-out);
+}
+
+@supports (-webkit-text-stroke: 1px) {
+  .page-home .footer-brand a {
+    color: transparent;
+    -webkit-text-stroke: var(--hairline) var(--text);
+  }
+
+  .page-home .footer-brand a:hover { color: var(--text); }
+}
+
+.page-home .footer-brand span { color: var(--accent); }
+
+@supports (-webkit-text-stroke: 1px) {
+  .page-home .footer-brand span {
+    color: transparent;
+    -webkit-text-stroke: calc(var(--hairline) * 1.5) var(--accent);
+  }
+
+  .page-home .footer-brand a:hover span { color: var(--accent); }
+}
+
+@media (max-width: 40rem) {
+  .page-home .footer-brand { font-size: 36vw; }
+}
+
+
+/* ---- 11. Reduced motion ------------------------------------------------- */
+
+/* stack.css declares `top` on every [data-stack-item] so stack.js can read
+   the sticky offset, and .post--planned is position: relative. Whenever the
+   pile is off (narrow or short viewport, reduced motion) that `top` would
+   push the cards down over the next band, so it is dropped in exactly the
+   conditions stack.css uses to switch the pile off. */
+@media (max-width: 47.999em), (max-height: 39.999em) {
+  .page-home [data-stack-item] { top: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) .page-home [data-stack-item] { top: auto; }
+}
+
+html[data-motion="reduced"] .page-home [data-stack-item] { top: auto; }
+
+/* home.js already stops the roller, the slide and the highlight when motion
+   is off. These rules are the net for the frame before it reacts and for
+   the stylesheet loading without the script. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) .roller-col { transition: none; }
+  html:not([data-motion="full"]) .about-lead .hl-w { opacity: 1; }
+  html:not([data-motion="full"]) .round-btn svg { transition: none; }
+}
+
+html[data-motion="reduced"] .roller-col { transition: none; }
+html[data-motion="reduced"] .about-lead .hl-w { opacity: 1 !important; }
+html[data-motion="reduced"] .round-btn svg { transition: none; }
+
+
+/* ---- 12. Print ---------------------------------------------------------- */
+
+@media print {
+  .marquee,
+  .round-btn,
+  .dash-grid,
+  .slide-word,
+  .stat-echo { display: none !important; }
+
+  .about-lead .hl-w { opacity: 1 !important; }
+}

@@ -1,0 +1,2339 @@
+/* ==========================================================================
+   main.css — base, layout and components
+   --------------------------------------------------------------------------
+   Requires css/tokens.css to be loaded first.
+
+   Rules of this file:
+     1. No raw colour, no raw font-size. Every value comes from a token.
+     2. The only literals are hairlines (1px) and a blur radius, both
+        declared once in "Derived channels" below.
+     3. Everything interactive has hover, active and focus-visible states,
+        all eased on --ease-spring.
+     4. Every animation is switched off by the reduced-motion block at the
+        end of this file. No exceptions.
+
+   Contents
+     01  Derived channels
+     02  Reset & base
+     03  Focus, selection, skip link
+     04  Typography
+     05  Layout: container, section, section-head, grids
+     06  Utilities: glass, visually-hidden, tabular
+     07  Reveal contract
+     08  Navigation shell
+     09  Buttons
+     10  Tags, pill links, kbd
+     11  Proof bar
+     12  Project cards
+     13  Case study
+     14  Timeline
+     15  Writing / posts
+     16  Photography grid
+     17  Lightbox
+     18  Command palette
+     19  Contact form
+     20  Footer
+     21  Responsive: nav collapse & small-screen fixes
+     22  Reduced motion, reduced transparency, print
+   ========================================================================== */
+
+
+/* ==========================================================================
+   01  Derived channels
+   Values composed from the token scale so component rules stay literal-free.
+   ========================================================================== */
+:root {
+  /* Hairline width. The one honest px literal: a 1px rule must stay 1px at
+     every zoom level and must never scale with the space ramp. */
+  --hairline: 1px;
+
+  /* Minimum touch target: 2.75rem = 44px. */
+  --tap: calc(var(--s-6) + var(--s-3));
+
+  /* Navigation heights. */
+  --nav-h: calc(var(--s-7) + var(--s-3));   /* 3.75rem */
+  --nav-h-compact: var(--s-7);              /* 3rem, .is-scrolled */
+
+  /* Grid column floor for auto-fitting card grids: 16rem. */
+  --col-min: calc(var(--s-11) + var(--s-8));
+
+  /* Overlay panel width: 36rem. */
+  --panel-w: calc(var(--s-11) * 3);
+
+  /* Timeline node diameter. */
+  --dot: calc(var(--s-2) - var(--hairline));
+
+  /* Backdrop blur radius for the glass material. */
+  --blur: 20px;
+}
+
+
+/* ==========================================================================
+   02  Reset & base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Smooth scroll is a motion effect and is gated, per the a11y contract. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  font-optical-sizing: auto;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* clip, not hidden: hidden would break position: sticky descendants. */
+  overflow-x: clip;
+  transition:
+    background-color var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out);
+}
+
+/* Anchor targets must clear the fixed navigation. */
+[id] {
+  scroll-margin-block-start: calc(var(--nav-h) + var(--s-5));
+}
+
+img,
+svg,
+video,
+canvas,
+picture {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+hr {
+  border: 0;
+  border-block-start: var(--hairline) solid var(--border);
+  margin-block: var(--s-7);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+[aria-disabled="true"],
+:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================================
+   03  Focus, selection, skip link
+   ========================================================================== */
+
+/* One global focus ring. Nothing in this project removes an outline without
+   replacing it with something at least as visible. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+/* Over a glass surface a 2px ring can get lost in the blur, so controls
+   mounted on glass get an additional soft halo behind the ring. */
+.glass :focus-visible,
+.site-nav :focus-visible,
+.cmdk-panel :focus-visible,
+.lightbox :focus-visible {
+  box-shadow: 0 0 0 calc(var(--s-1) + 2px) var(--accent-soft);
+}
+
+::selection {
+  /* Accent as a fill with background-coloured text: 6.72:1 dark, 4.9:1 light.
+     Never white-on-accent, which fails AA in dark. */
+  background-color: var(--accent);
+  color: var(--bg);
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--s-3);
+  inset-inline-start: var(--s-3);
+  z-index: var(--z-modal);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: var(--s-5);
+  border-radius: var(--r-pill);
+  background-color: var(--bg-elevated);
+  border: var(--hairline) solid var(--border-strong);
+  box-shadow: var(--glass-shadow);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  /* Off-screen but focusable. Not display:none, which would make it
+     unreachable by keyboard. */
+  transform: translateY(calc(-100% - var(--s-6)));
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+
+/* ==========================================================================
+   04  Typography
+   ========================================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+strong,
+b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+small {
+  font-size: var(--fs-sm);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+}
+
+/* The accent phrase ---------------------------------------------------------
+   Same display sans as the heading it sits in; the emphasis comes from weight
+   and colour, not from switching typeface. Permitted in exactly two places:
+   inside .hero-title and inside .section-title. Anywhere else it is a bug. */
+.hero-title .accent-word,
+.section-title .accent-word {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
+  color: var(--text-secondary);
+}
+
+/* Mono runs: eyebrows, metadata, tags, proof bar, keyboard hints. */
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.section-title {
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+}
+
+.section-sub {
+  max-width: var(--measure);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* Body prose, capped at the measure. */
+.prose {
+  max-width: var(--measure);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.prose > * + * {
+  margin-block-start: var(--s-4);
+}
+
+.prose h2,
+.prose h3 {
+  margin-block-start: var(--s-7);
+  color: var(--text);
+}
+
+.prose h2 {
+  font-size: var(--fs-xl);
+}
+
+.prose h3 {
+  font-size: var(--fs-lg);
+}
+
+.prose a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.prose a:hover {
+  opacity: 0.72;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: var(--s-5);
+}
+
+.prose ul li {
+  list-style: disc;
+}
+
+.prose ol li {
+  list-style: decimal;
+}
+
+.prose li + li {
+  margin-block-start: var(--s-2);
+}
+
+/* Numeric runs get tabular figures so columns of numbers align. */
+.tabular,
+time,
+.timeline-when,
+.proof-bar,
+.post time,
+.project-meta,
+.lightbox-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================================
+   05  Layout
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Vertical rhythm ----------------------------------------------------------
+   Each section carries half the beat, so the gap between two adjacent
+   sections is exactly --section-y. This is the whole reason the old site
+   felt arbitrary: it had per-section ad-hoc padding and no shared beat. */
+.section {
+  padding-block: calc(var(--section-y) * 0.5);
+}
+
+/* The first block on a page that has no hero must clear the fixed nav. */
+main > .section:first-child {
+  padding-block-start: calc(var(--section-y) * 0.5 + var(--nav-h));
+}
+
+/* Tonal variation inside one theme. Never a theme flip, only a tint. */
+.section--sunken {
+  background-color: var(--bg-sunken);
+}
+
+.section--flush-top {
+  padding-block-start: 0;
+}
+
+.section-head {
+  display: grid;
+  gap: var(--s-3);
+  max-width: var(--measure);
+  margin-block-end: var(--s-7);
+}
+
+/* Grid utilities -----------------------------------------------------------
+   Deliberately small. Four utilities cover every grid on the site. */
+.grid {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--col-min)), 1fr));
+}
+
+.grid--2 {
+  grid-template-columns: 1fr;
+}
+
+.grid--3 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 48em) {
+  .grid--2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 64em) {
+  .grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stack {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+
+/* ==========================================================================
+   06  Utilities
+   ========================================================================== */
+
+/* Liquid-glass surface -----------------------------------------------------
+   A web approximation of a frosted material, not Apple's Liquid Glass:
+   backdrop blur + saturation, a translucent fill, a hairline border, and a
+   1px inner top highlight that reads as edge refraction. */
+.glass {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--glass-bg);
+  border: var(--hairline) solid var(--glass-border);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 var(--hairline) 0 var(--glass-border);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+}
+
+/* Mandatory fallback: without backdrop-filter the translucent fill would let
+   content show through as mud, so every glass surface goes solid. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .site-nav.is-scrolled,
+  .cmdk-panel,
+  .cmdk,
+  .lightbox {
+    background-color: var(--bg-elevated);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ==========================================================================
+   07  Reveal contract
+   --------------------------------------------------------------------------
+   Agent D sets style="--reveal-i: N", where N encodes hierarchy, not source
+   order. Agent C toggles .is-revealed.
+
+   The stagger is not a uniform fade-up. Two things decay as N rises:
+     - travel distance: the primary element makes the big gesture (22px),
+       supporting elements barely move (floor 6px)
+     - duration: primary arrives slowly and deliberately, supporting elements
+       catch up quickly so the group resolves rather than trickles
+   A uniform 0.6s fade-up on every node is the single loudest template tell;
+   this shape reads as one considered movement with a lead voice.
+   ========================================================================== */
+[data-reveal] {
+  --reveal-i: 0;
+  --reveal-shift: max(6px, calc(22px - var(--reveal-i) * 4px));
+  --reveal-delay: calc(var(--reveal-i) * 55ms);
+  --reveal-dur: max(340ms, calc(var(--dur-slow) - var(--reveal-i) * 45ms));
+
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-shift), 0);
+  transition:
+    opacity var(--reveal-dur) var(--ease-out) var(--reveal-delay),
+    transform var(--reveal-dur) var(--ease-spring) var(--reveal-delay);
+  will-change: opacity, transform;
+}
+
+/* Media and large imagery: rising rectangles look cheap, so these fade only. */
+[data-reveal="fade"] {
+  transform: none;
+}
+
+.is-revealed {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* If JS never runs, nothing is hidden. Content is never gated behind script. */
+.no-js [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ==========================================================================
+   08  Navigation shell
+   ========================================================================== */
+.site-nav {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--z-nav);
+  /* Transparent at the top of the page so the hero reads full-bleed. The
+     glass only materialises once there is content to sit above. */
+  background-color: transparent;
+  border-block-end: var(--hairline) solid transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    backdrop-filter var(--dur-base) var(--ease-out);
+}
+
+.site-nav.is-scrolled {
+  background-color: var(--glass-bg-solid);
+  border-block-end-color: var(--border);
+  box-shadow: inset 0 var(--hairline) 0 var(--glass-border);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  min-height: var(--nav-h);
+  transition: min-height var(--dur-base) var(--ease-spring);
+}
+
+.site-nav.is-scrolled .nav-inner {
+  min-height: var(--nav-h-compact);
+}
+
+/* Logo --------------------------------------------------------------------- */
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline-end: var(--s-2);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.nav-logo:hover {
+  opacity: 0.7;
+}
+
+.nav-logo span {
+  color: var(--accent-text);
+}
+
+/* Links + liquid indicator -------------------------------------------------
+   .nav-indicator is an empty <li> that slides and resizes under the active
+   link. Agent C drives it by setting --ind-x and --ind-w on the element and
+   toggling .is-visible. */
+.nav-links {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.nav-indicator {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  height: calc(var(--s-6) + var(--s-1));
+  width: var(--ind-w, 0px);
+  transform: translate3d(var(--ind-x, 0px), -50%, 0);
+  border-radius: var(--r-pill);
+  background-color: var(--surface-hover);
+  box-shadow: inset 0 var(--hairline) 0 var(--glass-border);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    translate var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring),
+    width var(--dur-base) var(--ease-spring),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.nav-indicator.is-visible {
+  opacity: 1;
+}
+
+.nav-links a {
+  position: relative;
+  z-index: var(--z-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding-inline: var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.nav-links a:hover {
+  color: var(--text);
+}
+
+.nav-links a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Actions ------------------------------------------------------------------ */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.cmdk-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding-inline: var(--s-3) var(--s-2);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  color: var(--text-tertiary);
+  font-size: var(--fs-xs);
+  transition:
+    background-color var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-spring),
+    color var(--dur-fast) var(--ease-spring);
+}
+
+.cmdk-trigger:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.cmdk-trigger:active {
+  transform: scale(0.98);
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid transparent;
+  background-color: transparent;
+  color: var(--text-secondary);
+  transition:
+    background-color var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-spring),
+    color var(--dur-fast) var(--ease-spring),
+    transform var(--dur-fast) var(--ease-spring);
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.icon-btn[aria-pressed="true"] {
+  color: var(--accent-text);
+  background-color: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+
+.icon-btn svg {
+  width: calc(var(--s-4) + var(--s-1));
+  height: calc(var(--s-4) + var(--s-1));
+}
+
+
+/* ==========================================================================
+   09  Buttons
+   --------------------------------------------------------------------------
+   Press and magnetic pull share one transform channel so they compose instead
+   of overwriting each other. Agent C's [data-magnetic] handler sets --mx/--my
+   in px; it must not write to `transform` directly.
+   ========================================================================== */
+.btn {
+  --mx: 0px;
+  --my: 0px;
+  --press: 1;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding-inline: var(--s-5);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid transparent;
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-normal);
+  white-space: nowrap;
+  text-align: center;
+  transform: translate3d(var(--mx), var(--my), 0) scale(var(--press));
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.btn:active {
+  --press: 0.97;
+  transition-duration: var(--dur-fast);
+}
+
+.btn svg {
+  width: var(--s-4);
+  height: var(--s-4);
+}
+
+/* Primary: an inverted solid. Highest possible contrast in both themes
+   (18.6:1 dark, 15.9:1 light) and it keeps the accent free for rings, rules
+   and state, where contrast is carried by a different pairing. White text on
+   the accent fill would be 3.13:1 in dark, so it is never used. */
+.btn-primary {
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 var(--s-2) var(--s-5) var(--accent-soft);
+  transform: translate3d(var(--mx), calc(var(--my) - 1px), 0) scale(var(--press));
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+
+/* ==========================================================================
+   10  Tags, pill links, kbd
+   ========================================================================== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-sm);
+  border: var(--hairline) solid var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--s-5) + var(--s-1));
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-sm);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  color: var(--text-tertiary);
+  font-size: var(--fs-mono);
+  line-height: 1;
+}
+
+/* Pill links ---------------------------------------------------------------
+   Three link states, and the shape itself carries the meaning:
+     --live / --repo  pill-shaped, they move under the cursor, they are actions
+     --private        rectangular, it does not move, it is a fact
+   The private variant is a <span>. It must not look like a disabled button,
+   because it is not broken and it is not waiting on the user. */
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: calc(var(--s-6) + var(--s-2));
+  padding-inline: var(--s-4);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid transparent;
+  font-size: var(--fs-xs);
+  font-weight: 560;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+/* Full 44px target on anything that is plausibly a touch device. Two signals,
+   because pointer media support is not universal and a 320px viewport is a
+   phone regardless of what the pointer query reports. */
+@media (pointer: coarse), (max-width: 43.99em) {
+  .pill-link {
+    min-height: var(--tap);
+  }
+}
+
+.pill-link--live {
+  background-color: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.pill-link--live:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.pill-link--live:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.pill-link--repo {
+  background-color: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.pill-link--repo:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  transform: translateY(-1px);
+}
+
+.pill-link--repo:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Private: a designed absence -----------------------------------------------
+   Not a pill, so it never reads as a button someone forgot to wire up.
+   Square-ish corners, mono uppercase, tertiary text, a faint diagonal hatch
+   that says "sealed" rather than "disabled", and no hover motion at all:
+   on this site things that move are things you can do. Text stays selectable
+   so the visitor can copy the ask. */
+.pill-link--private {
+  border-radius: var(--r-sm);
+  border-color: var(--border);
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--border) 0 var(--hairline),
+    transparent var(--hairline) var(--s-2)
+  );
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  padding-inline: var(--s-3);
+  cursor: default;
+  user-select: text;
+  transition: none;
+}
+
+
+/* ==========================================================================
+   11  Proof bar
+   A spec strip, not a stat wall. Mono, tabular, hairline-separated.
+   ========================================================================== */
+.proof-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.proof-bar > li {
+  padding-inline-start: var(--s-3);
+  border-inline-start: var(--hairline) solid var(--border);
+}
+
+.proof-bar > li:first-child {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+
+.proof-bar strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+
+/* ==========================================================================
+   12  Project cards
+   ========================================================================== */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
+  box-shadow: var(--glass-shadow);
+  transform: translateY(-2px);
+}
+
+.project-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: var(--bg-sunken);
+  border-block-end: var(--hairline) solid var(--border);
+}
+
+.project-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.project-card:hover .project-media img {
+  transform: scale(1.03);
+}
+
+.project-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  flex: 1;
+  padding: var(--s-5);
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.project-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+.project-desc {
+  max-width: var(--measure);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+/* Links sit on the baseline of the card regardless of description length. */
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-block-start: auto;
+  padding-block-start: var(--s-2);
+}
+
+
+/* ==========================================================================
+   13  Case study
+   ========================================================================== */
+.case {
+  border-radius: var(--r-xl);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  padding: var(--s-6);
+}
+
+@media (min-width: 48em) {
+  .case {
+    padding: var(--s-8);
+  }
+}
+
+.case-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.case-title {
+  margin-block: var(--s-3) var(--s-6);
+  font-size: var(--fs-xl);
+  letter-spacing: var(--ls-tight);
+}
+
+.case-grid {
+  display: grid;
+  gap: var(--s-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--col-min)), 1fr));
+}
+
+.case-block {
+  display: grid;
+  gap: var(--s-3);
+  align-content: start;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  /* A rule above each block instead of a box around it: the grid already
+     groups them, so a card would be a second, redundant container. */
+  border-block-start: var(--hairline) solid var(--border);
+  padding-block-start: var(--s-4);
+}
+
+.case-block[data-label]::before {
+  content: attr(data-label);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+
+/* ==========================================================================
+   14  Timeline
+   ========================================================================== */
+.timeline {
+  position: relative;
+  display: grid;
+  gap: var(--s-7);
+  padding-inline-start: var(--s-6);
+}
+
+/* The spine fades at both ends so it reads as a continuing line rather than
+   a box edge. */
+.timeline::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--dot) * 0.5 - var(--hairline) * 0.5);
+  width: var(--hairline);
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border) 8%,
+    var(--border) 92%,
+    transparent
+  );
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--s-6) * -1);
+  inset-block-start: 0.6em;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: var(--r-pill);
+  background-color: var(--bg);
+  box-shadow: 0 0 0 var(--hairline) var(--border-strong);
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring);
+}
+
+.timeline-item:hover::before {
+  background-color: var(--accent);
+  box-shadow:
+    0 0 0 var(--hairline) var(--accent),
+    0 0 0 var(--s-1) var(--accent-soft);
+}
+
+.timeline-when {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.timeline-org {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+.timeline-role {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.timeline-detail {
+  max-width: var(--measure);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+
+/* ==========================================================================
+   15  Writing / posts
+   --------------------------------------------------------------------------
+   No dividers between rows. The hover fill does the separating, which keeps
+   a short list from looking like a spec table.
+   ========================================================================== */
+.post-list {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.post {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-5);
+  border-radius: var(--r-md);
+  border: var(--hairline) solid transparent;
+  background-color: transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+a.post:hover {
+  background-color: var(--surface);
+  border-color: var(--border);
+  transform: translateX(2px);
+}
+
+a.post:active {
+  transform: translateX(0);
+}
+
+.post h2,
+.post h3,
+.post-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+a.post:hover :is(h2, h3, .post-title) {
+  color: var(--accent-text);
+}
+
+.post time,
+.post-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.post p {
+  max-width: var(--measure);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* Planned posts ------------------------------------------------------------
+   The same honesty problem as .pill-link--private. A planned post is an
+   <article>, not a link, so it gets a dashed spine instead of the hover fill:
+   the line is drawn but not yet solid. Nothing is greyed out, nothing is
+   disabled, and it sits at the same weight as the published rows because a
+   stated intention is real content, not a placeholder. */
+.post--planned {
+  position: relative;
+  padding-inline-start: calc(var(--s-5) + var(--s-3));
+  border-color: var(--border);
+}
+
+.post--planned::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--s-5);
+  inset-inline-start: var(--s-5);
+  width: calc(var(--hairline) * 2);
+  border-radius: var(--r-pill);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--border-strong) 0 var(--s-1),
+    transparent var(--s-1) var(--s-2)
+  );
+}
+
+.post--planned :is(h2, h3, .post-title) {
+  color: var(--text);
+}
+
+.post-status {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+
+/* ==========================================================================
+   16  Photography grid
+   Masonry by columns: photographs keep their own aspect ratio instead of
+   being cropped into a uniform grid.
+   ========================================================================== */
+.photo-grid {
+  columns: 1;
+  column-gap: var(--s-4);
+}
+
+@media (min-width: 40em) {
+  .photo-grid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 64em) {
+  .photo-grid {
+    columns: 3;
+  }
+}
+
+.photo-card {
+  display: block;
+  width: 100%;
+  margin-block-end: var(--s-4);
+  padding: 0;
+  overflow: hidden;
+  break-inside: avoid;
+  border-radius: var(--r-md);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--bg-sunken);
+  text-align: start;
+  transition:
+    border-color var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.photo-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--glass-shadow);
+  transform: translateY(-2px);
+}
+
+.photo-card:active {
+  transform: translateY(0);
+}
+
+.photo-card img {
+  width: 100%;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.photo-card:hover img {
+  transform: scale(1.02);
+}
+
+.photo-caption {
+  display: block;
+  padding: var(--s-3) var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  color: var(--text-tertiary);
+}
+
+
+/* ==========================================================================
+   17  Lightbox
+   ========================================================================== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--s-4);
+  padding: var(--gutter);
+  background-color: var(--glass-bg-solid);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    visibility 0s linear var(--dur-base);
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    visibility 0s linear 0s;
+}
+
+.lightbox-img {
+  grid-row: 2;
+  justify-self: center;
+  align-self: center;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--r-md);
+  box-shadow: var(--glass-shadow);
+  transform: scale(0.98);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.lightbox.is-open .lightbox-img {
+  transform: scale(1);
+}
+
+.lightbox-meta {
+  grid-row: 3;
+  justify-self: center;
+  max-width: var(--measure);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-mono);
+  color: var(--text-secondary);
+}
+
+.lightbox-close,
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  display: inline-grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--r-pill);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+  transition:
+    background-color var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-spring),
+    transform var(--dur-fast) var(--ease-spring);
+}
+
+.lightbox-close:hover,
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.lightbox-close:active,
+.lightbox-prev:active,
+.lightbox-next:active {
+  transform: scale(0.92);
+}
+
+.lightbox-close {
+  inset-block-start: var(--gutter);
+  inset-inline-end: var(--gutter);
+}
+
+.lightbox-prev,
+.lightbox-next {
+  inset-block-start: 50%;
+  margin-block-start: calc(var(--tap) * -0.5);
+}
+
+.lightbox-prev {
+  inset-inline-start: var(--gutter);
+}
+
+.lightbox-next {
+  inset-inline-end: var(--gutter);
+}
+
+.lightbox svg {
+  width: var(--s-5);
+  height: var(--s-5);
+}
+
+/* On narrow screens the side arrows would sit on top of the photograph, so
+   they move to the bottom bar next to the caption. */
+@media (max-width: 40em) {
+  .lightbox-prev,
+  .lightbox-next {
+    inset-block-start: auto;
+    inset-block-end: var(--gutter);
+    margin-block-start: 0;
+  }
+}
+
+
+/* ==========================================================================
+   18  Command palette
+   ========================================================================== */
+.cmdk {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding-block-start: min(12vh, var(--s-10));
+  padding-inline: var(--gutter);
+  padding-block-end: var(--gutter);
+  background-color: var(--glass-bg-solid);
+  backdrop-filter: blur(calc(var(--blur) * 0.6));
+  -webkit-backdrop-filter: blur(calc(var(--blur) * 0.6));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    visibility 0s linear var(--dur-fast);
+}
+
+.cmdk.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    visibility 0s linear 0s;
+}
+
+.cmdk-panel {
+  width: 100%;
+  max-width: var(--panel-w);
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: var(--hairline) solid var(--glass-border);
+  background-color: var(--bg-elevated);
+  box-shadow: var(--glass-shadow);
+  transform: translateY(calc(var(--s-2) * -1)) scale(0.98);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.cmdk.is-open .cmdk-panel {
+  transform: translateY(0) scale(1);
+}
+
+.cmdk-input {
+  display: block;
+  width: 100%;
+  padding: var(--s-4) var(--s-5);
+  border: 0;
+  border-block-end: var(--hairline) solid var(--border);
+  background-color: transparent;
+  color: var(--text);
+  font-size: var(--fs-lg);
+  caret-color: var(--accent);
+}
+
+.cmdk-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.cmdk-input:focus-visible {
+  outline-offset: calc(var(--s-1) * -1);
+}
+
+.cmdk-list {
+  max-height: min(50dvh, var(--s-11));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--s-2);
+}
+
+.cmdk-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-align: start;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.cmdk-item:hover,
+.cmdk-item[aria-selected="true"] {
+  background-color: var(--surface-hover);
+  color: var(--text);
+  /* An accent rule on the leading edge rather than an accent fill, which
+     would put low-contrast text on a saturated background. */
+  box-shadow: inset calc(var(--hairline) * 2) 0 0 var(--accent);
+}
+
+.cmdk-item small,
+.cmdk-item .tag {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+}
+
+.cmdk-empty {
+  padding: var(--s-7) var(--s-5);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+
+
+/* ==========================================================================
+   19  Contact form
+   ========================================================================== */
+.contact-form {
+  display: grid;
+  gap: var(--s-5);
+  max-width: var(--measure);
+}
+
+/* A grid child stretches by default; a submit button the full width of the
+   measure reads as a banner, not a button. */
+.contact-form .btn {
+  justify-self: start;
+}
+
+.field {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.field-label {
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  color: var(--text-secondary);
+}
+
+.field-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  border: var(--hairline) solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-snug);
+  transition:
+    background-color var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-spring);
+}
+
+.field-input::placeholder {
+  /* --text-tertiary is the lowest-contrast token on the page and still clears
+     AA (5.91:1 dark, 4.72:1 light). Nothing lighter than this, ever. */
+  color: var(--text-tertiary);
+}
+
+.field-input:hover {
+  border-color: var(--border-strong);
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+  background-color: var(--bg-elevated);
+}
+
+textarea.field-input {
+  min-height: calc(var(--s-10) + var(--s-6));
+  resize: vertical;
+}
+
+/* Error state --------------------------------------------------------------
+   Driven by aria-invalid, so the visual state and the accessibility state
+   cannot drift apart. .field.has-error is supported as a parent hook. */
+.field-input[aria-invalid="true"],
+.field.has-error .field-input {
+  border-color: var(--danger);
+  background-color: var(--danger-soft);
+}
+
+.field-input[aria-invalid="true"]:focus,
+.field.has-error .field-input:focus {
+  border-color: var(--danger);
+}
+
+.field-error {
+  display: none;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+  color: var(--danger-text);
+}
+
+.field-input[aria-invalid="true"] ~ .field-error,
+.field.has-error .field-error {
+  display: block;
+}
+
+/* Status region ------------------------------------------------------------ */
+.form-status {
+  min-height: var(--s-5);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--text-secondary);
+}
+
+.form-status:empty {
+  min-height: 0;
+}
+
+.form-status[data-state="error"] {
+  color: var(--danger-text);
+}
+
+.form-status[data-state="success"] {
+  color: var(--accent-text);
+}
+
+.form-status[data-state="pending"] {
+  color: var(--text-tertiary);
+}
+
+
+/* ==========================================================================
+   20  Footer
+   ========================================================================== */
+.site-footer {
+  margin-block-start: var(--section-y);
+  padding-block: var(--s-8) var(--s-7);
+  border-block-start: var(--hairline) solid var(--border);
+}
+
+.site-footer .container {
+  display: grid;
+  gap: var(--s-6);
+  align-items: end;
+}
+
+@media (min-width: 48em) {
+  .site-footer .container {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.site-footer p,
+.site-footer li {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+
+.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+}
+
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--text-secondary);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.site-footer a:hover {
+  color: var(--text);
+}
+
+
+/* ==========================================================================
+   21  Responsive: nav collapse & small-screen fixes
+   Mobile first everywhere above; this block handles the one layout that has
+   to restructure rather than reflow.
+   ========================================================================== */
+
+/* Below 44em the logo, actions and four links cannot share one line at 320px
+   without clipping, so the links drop to a second row. They stay one line
+   (measured at 320px with --fs-xs they fit inside the gutter) and the row can
+   scroll horizontally as a safety net for longer labels. */
+@media (max-width: 43.99em) {
+  :root {
+    --nav-h: calc(var(--s-9) + var(--s-4));
+    --nav-h-compact: var(--s-9);
+  }
+
+  .nav-inner {
+    flex-wrap: wrap;
+    padding-block: var(--s-2);
+    row-gap: var(--s-1);
+  }
+
+  .nav-logo {
+    order: 1;
+  }
+
+  .nav-actions {
+    order: 2;
+  }
+
+  .nav-links {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a {
+    padding-inline: var(--s-2);
+    font-size: var(--fs-xs);
+  }
+
+  /* The trigger keeps its accessible name but loses the shortcut hint, which
+     is meaningless without a keyboard. */
+  .cmdk-trigger kbd {
+    display: none;
+  }
+
+  .cmdk-trigger {
+    padding-inline: var(--s-3);
+  }
+}
+
+/* At the very bottom of the range, tighten the only two things that overflow
+   before the gutter does its job. */
+@media (max-width: 22.5em) {
+  .nav-logo {
+    font-size: var(--fs-sm);
+  }
+
+  .nav-actions {
+    gap: 0;
+  }
+}
+
+
+/* ==========================================================================
+   22  Reduced motion, reduced transparency, print
+   ========================================================================== */
+
+/* Global kill switch. Durations collapse to 1ms rather than 0 so that any
+   transitionend / animationend listener Agent C writes still fires. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Revealed immediately, with no transform, as the contract requires. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Hover lifts and scales are motion too. */
+  .project-card:hover,
+  .photo-card:hover,
+  .btn-primary:hover,
+  a.post:hover,
+  .pill-link--live:hover,
+  .pill-link--repo:hover {
+    transform: none !important;
+  }
+
+  .project-card:hover .project-media img,
+  .photo-card:hover img,
+  .lightbox-img,
+  .cmdk-panel {
+    transform: none !important;
+  }
+}
+
+/* The same switch, driven by the [data-motion-toggle] button. Agent C sets
+   data-motion="reduced" on <html> and mirrors it in aria-pressed. */
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
+  transition-duration: 1ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-motion="reduced"] [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Transparency is a separate preference from motion. When it is reduced the
+   blur goes away and every glass surface becomes an opaque panel. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .site-nav.is-scrolled,
+  .cmdk,
+  .cmdk-panel,
+  .lightbox {
+    background-color: var(--bg-elevated);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Higher contrast borders when the user asks for them. */
+@media (prefers-contrast: more) {
+  :root {
+    --border: var(--border-strong);
+  }
+
+  .btn,
+  .pill-link,
+  .field-input,
+  .tag {
+    border-color: var(--border-strong);
+  }
+}
+
+@media print {
+  .site-nav,
+  .cmdk,
+  .lightbox,
+  .skip-link,
+  .scroll-cue {
+    display: none !important;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Colours for print come from the @media print token block in tokens.css. */
+  body {
+    background: none;
+  }
+
+  .glass,
+  .project-card,
+  .case,
+  .photo-card {
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+   14. Page-level layout — integration pass
+   Structural hooks the page markup needs that the component layer above
+   doesn't cover: page grids, the proof bar internals, toolbox, footer.
+   ========================================================================== */
+
+/* --- Proof bar internals ------------------------------------------------- */
+.proof-value {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.proof-label {
+  display: block;
+  margin-top: var(--s-2);
+  max-width: 22ch;
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--text-tertiary);
+  text-wrap: balance;
+}
+
+/* --- About / intro split ------------------------------------------------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .about-grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--s-8);
+    align-items: center;
+  }
+  /* Copy leads, portrait follows — reading order stays correct in the DOM. */
+  .about-copy { order: 1; }
+  .about-figure { order: 2; }
+}
+
+.about-figure {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-elevated);
+  aspect-ratio: 1 / 1;
+  max-width: 420px;
+}
+
+.about-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.about-figure:hover img { transform: scale(1.03); }
+
+.about-copy > .section-title { margin-top: 0; }
+
+/* --- Case study lede ----------------------------------------------------- */
+.case-lede {
+  max-width: var(--measure);
+  margin: var(--s-4) 0 var(--s-6);
+  font-size: var(--fs-lg);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* --- Writing blurb ------------------------------------------------------- */
+.post-blurb {
+  max-width: var(--measure);
+  margin: var(--s-3) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* --- Section footer (trailing CTA row) ----------------------------------- */
+.section-foot {
+  margin-top: var(--s-7);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* --- Toolbox ------------------------------------------------------------- */
+.toolbox {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--s-6) var(--s-5);
+}
+
+.toolbox-group { min-width: 0; }
+
+.toolbox-title {
+  margin: 0 0 var(--s-4);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* --- Contact layout ------------------------------------------------------ */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .contact-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    gap: var(--s-8);
+  }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+}
+
+@media (min-width: 640px) {
+  .field-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.contact-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.contact-aside .field-label { margin: 0; }
+
+/* --- Social links -------------------------------------------------------- */
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-link {
+  position: relative;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.social-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.social-link:hover { color: var(--accent-text); }
+.social-link:hover::after { transform: scaleX(1); }
+
+/* --- Footer -------------------------------------------------------------- */
+.footer-inner {
+  display: grid;
+  gap: var(--s-5);
+  padding-block: var(--s-7);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 760px) {
+  .footer-inner {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "brand links"
+      "meta  meta";
+    align-items: center;
+    column-gap: var(--s-7);
+  }
+  .footer-brand { grid-area: brand; }
+  .footer-links { grid-area: links; justify-content: flex-end; }
+  .footer-meta  { grid-area: meta; }
+}
+
+.footer-brand {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.footer-brand a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.footer-brand span { color: var(--accent-text); }
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+}
+
+.footer-links a {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.footer-links a:hover { color: var(--text); }
+
+.footer-meta {
+  margin: 0;
+  max-width: var(--measure);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+/* --- Photo card trigger --------------------------------------------------
+   The card is a <figure> with a real <button> inside: the lightbox listens on
+   the figure, and a bare figure would be unreachable by keyboard. */
+.photo-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.photo-open img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.photo-card:hover .photo-open img { transform: scale(1.035); }
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-open img,
+  .photo-card:hover .photo-open img { transition: none; transform: none; }
+}
+
+/* ==========================================================================
+   15. Missing states — review pass
+   ========================================================================== */
+
+/* --- Page transition ------------------------------------------------------
+   js/app.js adds .page-exit and navigates after ~260ms. Without this rule the
+   delay was real but the fade was not, so every internal link just felt slow. */
+.page-exit main,
+.page-exit .site-footer {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-exit main,
+  .page-exit .site-footer { opacity: 1; transition: none; }
+}
+
+html[data-motion="reduced"] .page-exit main,
+html[data-motion="reduced"] .page-exit .site-footer { opacity: 1; transition: none; }
+
+/* --- Command palette: JS-generated bits ----------------------------------
+   app.js emits .cmdk-item-kind and <mark class="cmdk-mark">; neither had a
+   rule, so the fuzzy-match highlight fell back to the UA's yellow <mark>. */
+.cmdk-mark {
+  background: none;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.cmdk-item-kind {
+  margin-inline-start: auto;
+  padding-inline-start: var(--s-3);
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* --- Copy confirmation ---------------------------------------------------- */
+[data-copy].is-copied {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+/* --- Release compositor layers after the reveal has run ------------------- */
+[data-reveal].is-revealed { will-change: auto; }

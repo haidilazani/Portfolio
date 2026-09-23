@@ -1,153 +1,349 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark" data-motion="full">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aidil Azani – About</title>
-    <meta name="description" content="About Aidil Azani — background, skills and experience.">
+
+    <title>About - Aidil Azani</title>
+    <meta name="description"
+        content="Computer science student at UiTM Shah Alam, frontend developer at JustSimple 2023-2024, and the person who wrote every line of this site by hand.">
+
+    <!-- Seed theme + motion before first paint so neither flashes. -->
     <script>
         (function () {
-            var t; try { t = localStorage.getItem('theme'); } catch (e) { }
-            document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            var t, m; try { t = localStorage.getItem('theme'); m = localStorage.getItem('motion'); } catch (e) { }
+            var d = document.documentElement;
+            d.className = d.className.replace(/\bno-js\b/, 'js');
+            d.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            d.setAttribute('data-motion', m === 'reduced' ? 'reduced' : 'full');
         })();
     </script>
-    <link rel="stylesheet" href="css/portfolio.css">
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#060607" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/about.html">
+
+    <meta property="og:type" content="profile">
+    <meta property="og:site_name" content="Aidil Azani">
+    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/about.html">
+    <meta property="og:title" content="About - Aidil Azani">
+    <meta property="og:description"
+        content="Computer science student at UiTM Shah Alam and a frontend developer who writes interfaces by hand.">
+    <meta property="og:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:image:alt" content="Aidil Azani">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@aidilazani">
+    <meta name="twitter:creator" content="@aidilazani">
+    <meta name="twitter:title" content="About - Aidil Azani">
+    <meta name="twitter:description"
+        content="Computer science student at UiTM Shah Alam and a frontend developer who writes interfaces by hand.">
+    <meta name="twitter:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Aidil Azani",
+      "url": "https://haidilazani.github.io/Portfolio/",
+      "inLanguage": "en",
+      "author": { "@type": "Person", "name": "Aidil Azani" }
+    }
+    </script>
 </head>
 
 <body>
 
-    <header class="site-nav">
-        <nav class="glass-nav" aria-label="Main navigation">
-            <a href="index.html" class="nav-logo">aidil<span>.</span></a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav" data-nav>
+        <nav class="nav-inner" aria-label="Primary">
+            <a class="nav-logo" href="index.html">aidil<span>.</span></a>
             <ul class="nav-links">
                 <li class="nav-indicator" aria-hidden="true"></li>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
                 <li><a href="work.html">Work</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="memory.html">Memory</a></li>
+                <li><a href="about.html" aria-current="page">About</a></li>
+                <li><a href="blog.html">Writing</a></li>
+                <li><a href="photography.html">Photography</a></li>
             </ul>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark / light mode">
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-                </svg>
-            </button>
+            <div class="nav-actions">
+                <button class="cmdk-trigger" type="button" data-cmdk-open>Search <kbd>&#8984;K</kbd></button>
+                <button class="icon-btn" type="button" data-motion-toggle aria-pressed="false"
+                    aria-label="Toggle reduced motion">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M3 12h3.2l2.6-7 4.4 14 2.6-7H21" />
+                    </svg>
+                </button>
+                <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false"
+                    aria-label="Toggle colour theme">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+                    </svg>
+                </button>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <main id="main">
 
-        <!-- Intro -->
-        <section class="container">
-            <div class="about-split">
-                <div class="about-photo reveal">
-                    <img src="images/about.JPEG" alt="Aidil Azani">
-                </div>
-                <div class="about-copy reveal reveal-delay-1">
-                    <span class="eyebrow">About</span>
-                    <h1 class="section-title">Meet myself.</h1>
-                    <p>I'm <strong>Aidil Azani</strong> — a computer science student at UiTM Shah Alam and a
-                        frontend developer. I've chosen this path not knowing it would burn my brain and soul,
-                        yet I'm still standing here, pursuing what my heart never craved for.</p>
-                    <p>I care about interfaces that feel calm and intentional — clean type, honest spacing, and
-                        motion that earns its place. When I'm not coding, I'm usually behind a camera collecting
-                        the moments you'll find on my <a href="memory.html" class="text-link">Memory</a> page.</p>
-                    <div class="skills">
-                        <span class="skill-tag">Web Development</span>
-                        <span class="skill-tag">UI/UX Design</span>
-                        <span class="skill-tag">Data Science</span>
-                        <span class="skill-tag">Full-Stack</span>
-                        <span class="skill-tag">Machine Learning</span>
+        <!-- ================================================================
+             Bio
+             ================================================================ -->
+        <section class="section">
+            <div class="container about-grid">
+
+                <figure class="about-figure" data-reveal style="--reveal-i: 1">
+                    <img src="images/optimized/about-800.webp"
+                        alt="Aidil Azani, photographed close up against a plain background" width="800"
+                        height="800" fetchpriority="high" decoding="async">
+                </figure>
+
+                <div class="about-copy" data-reveal style="--reveal-i: 0">
+                    <h1 class="section-title">The longer <em class="accent-word">version.</em></h1>
+                    <div class="prose">
+                        <p>I'm Aidil, a computer science student at UiTM Shah Alam. I chose this path not knowing it
+                            would burn my brain and soul, yet I'm still standing here, and somewhere along the way
+                            it became mine.</p>
+                        <p>The work is less poetic. In 2022 I took small freelance jobs as a junior developer,
+                            learning the difference between classroom code and code someone is waiting on. In 2023 I
+                            joined JustSimple Sdn. Bhd. as a frontend developer, building and maintaining client
+                            websites in WordPress and Elementor, and writing the custom CSS that Elementor couldn't.
+                            Now I'm finishing my degree, with coursework across data science, machine learning and
+                            software engineering, and my final-year project is a tourism recommendation system in
+                            Flask that searches UNESCO World Heritage sites by meaning rather than keywords, using
+                            BERT sentence embeddings over an ontology of place categories.</p>
+                        <p>I care about interfaces that feel calm and intentional: clean type, honest spacing, and
+                            motion that earns its place. I like knowing what every line does, which is why this site
+                            has no framework, no bundler and no dependencies. The contour map breathing behind this
+                            text is ~1,390 lines of marching squares and value noise on a 2D canvas. When I'm not
+                            coding I'm behind a camera, collecting the moments on my
+                            <a href="photography.html">Photography</a> page.</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="stats-strip reveal">
-                <div class="stat">
-                    <span class="num">3+</span>
-                    <span class="label">Years building</span>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Verified facts.
+             This replaces the old "3+ years / 10+ projects" strip: those two
+             numbers could not be backed by anything public. These three can.
+             ================================================================ -->
+        <section class="section" id="facts">
+            <div class="container">
+                <ul class="proof-bar" data-reveal style="--reveal-i: 0">
+                    <li>
+                        <strong class="proof-value">0</strong>
+                        <span class="proof-label">npm packages, bundlers or frameworks</span>
+                    </li>
+                    <li>
+                        <strong class="proof-value">103 KB</strong>
+                        <span class="proof-label">gzipped over the wire: every page, all CSS and JS</span>
+                    </li>
+                    <li>
+                        <strong class="proof-value">1,390</strong>
+                        <span class="proof-label">lines of vanilla JS behind the contour terrain</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Experience
+             ================================================================ -->
+        <section class="section" id="experience">
+            <div class="container">
+
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Where I've <em class="accent-word">been.</em></h2>
                 </div>
-                <div class="stat">
-                    <span class="num">10+</span>
-                    <span class="label">Projects shipped</span>
+
+                <ol class="timeline">
+                    <li class="timeline-item" data-reveal style="--reveal-i: 1">
+                        <p class="timeline-when">Present</p>
+                        <h3 class="timeline-org">UiTM Shah Alam</h3>
+                        <p class="timeline-role">Computer Science student</p>
+                        <p class="timeline-detail">Degree coursework spanning data science, machine learning and
+                            software engineering. Final-year project: GeoTour, a semantic tourism recommendation
+                            system built in Flask with BERT sentence embeddings and an ontology graph.</p>
+                    </li>
+                    <li class="timeline-item" data-reveal style="--reveal-i: 2">
+                        <p class="timeline-when">2023 - 2024</p>
+                        <h3 class="timeline-org">JustSimple Sdn. Bhd.</h3>
+                        <p class="timeline-role">Frontend Developer</p>
+                        <p class="timeline-detail">Built and maintained client websites: turning briefs and mockups
+                            into responsive pages in WordPress and Elementor, and writing the custom CSS for
+                            everything the page builder couldn't do.</p>
+                    </li>
+                    <li class="timeline-item" data-reveal style="--reveal-i: 3">
+                        <p class="timeline-when">2022 - 2023</p>
+                        <h3 class="timeline-org">Freelance</h3>
+                        <p class="timeline-role">Junior Developer</p>
+                        <p class="timeline-detail">Small client projects: business sites and landing pages. First
+                            lessons in scope, revisions, and how shipped code differs from classroom code.</p>
+                    </li>
+                </ol>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Toolbox
+             ================================================================ -->
+        <section class="section" id="toolbox">
+            <div class="container">
+
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">What I <em class="accent-word">reach for.</em></h2>
                 </div>
-                <div class="stat">
-                    <span class="num">1</span>
-                    <span class="label">Soul still searching</span>
+
+                <div class="toolbox">
+                    <div class="toolbox-group" data-reveal style="--reveal-i: 1">
+                        <h3 class="toolbox-title">Languages</h3>
+                        <ul class="project-stack">
+                            <li class="tag">JavaScript (ES6)</li>
+                            <li class="tag">HTML</li>
+                            <li class="tag">CSS</li>
+                            <li class="tag">Python</li>
+                            <li class="tag">SQL</li>
+                            <li class="tag">GLSL</li>
+                        </ul>
+                    </div>
+
+                    <div class="toolbox-group" data-reveal style="--reveal-i: 1">
+                        <h3 class="toolbox-title">Frontend</h3>
+                        <ul class="project-stack">
+                            <li class="tag">Vanilla JS &amp; DOM</li>
+                            <li class="tag">Canvas 2D</li>
+                            <li class="tag">WebGL shaders</li>
+                            <li class="tag">Responsive CSS / custom properties</li>
+                            <li class="tag">CSS animation &amp; scroll-driven motion</li>
+                            <li class="tag">Accessibility basics (prefers-reduced-motion, ARIA labels)</li>
+                            <li class="tag">WordPress</li>
+                            <li class="tag">Elementor</li>
+                            <li class="tag">Figma</li>
+                        </ul>
+                    </div>
+
+                    <div class="toolbox-group" data-reveal style="--reveal-i: 2">
+                        <h3 class="toolbox-title">Tooling</h3>
+                        <ul class="project-stack">
+                            <li class="tag">Git &amp; GitHub</li>
+                            <li class="tag">GitHub Pages</li>
+                            <li class="tag">Vercel</li>
+                            <li class="tag">VS Code</li>
+                            <li class="tag">pip / virtualenv</li>
+                        </ul>
+                    </div>
+
+                    <div class="toolbox-group" data-reveal style="--reveal-i: 2">
+                        <h3 class="toolbox-title">Other</h3>
+                        <ul class="project-stack">
+                            <li class="tag">Flask</li>
+                            <li class="tag">SQLAlchemy</li>
+                            <li class="tag">SQLite &amp; PostgreSQL</li>
+                            <li class="tag">sentence-transformers / BERT embeddings</li>
+                            <li class="tag">pandas</li>
+                            <li class="tag">NumPy</li>
+                            <li class="tag">NetworkX</li>
+                            <li class="tag">Jinja templating</li>
+                            <li class="tag">Photography</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             Now
+             ================================================================ -->
+        <section class="section" id="now">
+            <div class="container">
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Now</h2>
+                </div>
+                <div class="prose" data-reveal style="--reveal-i: 1">
+                    <p>Finishing my computer science degree at UiTM Shah Alam and building GeoTour, my final-year
+                        project: a Flask search engine that ranks UNESCO World Heritage sites by meaning rather than
+                        keywords. Rebuilding this site by hand, again. Behind a camera whenever the light is right.
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- Experience -->
-        <section class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Experience</span>
-                <h2 class="section-title">Where I've been.</h2>
-            </div>
-            <ul class="timeline">
-                <li class="reveal">
-                    <span class="when">Currently</span>
-                    <h3>UiTM Shah Alam</h3>
-                    <p class="role">Computer Science Student</p>
-                    <p>Pursuing a degree in computer science — coursework spanning data science, machine
-                        learning and software engineering.</p>
-                </li>
-                <li class="reveal reveal-delay-1">
-                    <span class="when">2023 – 2024</span>
-                    <h3>JustSimple Sdn. Bhd</h3>
-                    <p class="role">Frontend Developer</p>
-                    <p>Built and maintained client websites — translating designs into responsive, polished
-                        frontends with WordPress, Elementor and custom code.</p>
-                </li>
-                <li class="reveal reveal-delay-2">
-                    <span class="when">2022 – 2023</span>
-                    <h3>Freelance</h3>
-                    <p class="role">Junior Developer</p>
-                    <p>First steps into professional work — small client projects that taught me how shipped
-                        code differs from classroom code.</p>
-                </li>
-            </ul>
-        </section>
-
-        <!-- Tools -->
-        <section class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Toolbox</span>
-                <h2 class="section-title">Tools &amp; technologies.</h2>
-            </div>
-            <div class="tools-list reveal">
-                <span class="tool-item">HTML / CSS / JavaScript</span>
-                <span class="tool-item">Python</span>
-                <span class="tool-item">VS Code</span>
-                <span class="tool-item">WordPress</span>
-                <span class="tool-item">Elementor</span>
-                <span class="tool-item">Git &amp; GitHub</span>
-                <span class="tool-item">Figma</span>
+        <!-- ================================================================
+             CTA
+             ================================================================ -->
+        <section class="section">
+            <div class="container">
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Open to internships <em class="accent-word">and freelance.</em></h2>
+                    <p class="section-sub">Malaysia or remote. I am based in Shah Alam, Selangor.</p>
+                    <p class="section-foot"><a class="btn btn-primary" href="index.html#contact" data-magnetic>Get in
+                            touch</a></p>
+                </div>
             </div>
         </section>
 
-        <!-- CTA -->
-        <section class="container">
-            <div class="section-head centered reveal">
-                <h2 class="section-title">Want to work together?</h2>
-                <p class="section-subtitle">I'm open to internships, freelance projects and good conversations.</p>
-                <a href="index.html#contact" class="btn btn-primary">Get in touch</a>
-            </div>
-        </section>
     </main>
 
-    <footer>
-        &copy; 2026 Aidil Azani. All rights reserved.
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p class="footer-brand"><a href="index.html">aidil<span>.</span></a></p>
+            <nav class="footer-links" aria-label="Footer">
+                <a href="work.html">Work</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Writing</a>
+                <a href="photography.html">Photography</a>
+                <a href="mailto:haidilazani@gmail.com">Email</a>
+            </nav>
+            <p class="footer-meta">&copy; 2026 Aidil Azani. Written by hand in HTML, CSS and JavaScript. No
+                dependencies, no build step.</p>
+        </div>
     </footer>
 
-    <script src="js/navbar.js"></script>
+    <!-- Command palette -->
+    <div class="cmdk" data-cmdk hidden>
+        <div class="cmdk-panel" aria-label="Search this site">
+            <input class="cmdk-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Search pages, projects and writing" aria-label="Search pages, projects and writing">
+            <ul class="cmdk-list">
+                <li><a class="cmdk-item" href="work.html">Work</a></li>
+                <li><a class="cmdk-item" href="about.html">About</a></li>
+                <li><a class="cmdk-item" href="blog.html">Writing</a></li>
+                <li><a class="cmdk-item" href="photography.html">Photography</a></li>
+                <li><a class="cmdk-item" href="index.html#contact">Contact</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani/FYP-1" target="_blank"
+                        rel="noopener">GeoTour source</a></li>
+                <li><a class="cmdk-item" href="https://haidilazani.github.io/Assignment/" target="_blank"
+                        rel="noopener">Buttermax study</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani" target="_blank"
+                        rel="noopener">GitHub</a></li>
+                <li><a class="cmdk-item" href="mailto:haidilazani@gmail.com">Email Aidil</a></li>
+            </ul>
+            <p class="cmdk-empty" hidden>Nothing matches that.</p>
+        </div>
+    </div>
+
+    <script src="js/app.js" defer></script>
 </body>
 
 </html>

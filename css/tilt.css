@@ -1,0 +1,302 @@
+/* ==========================================================================
+   tilt.css — pointer-tracked 3D tilt for the writing cards
+   --------------------------------------------------------------------------
+   Scope: [data-tilt] cards (.post--planned on blog.html and index.html).
+
+   PROPERTY-LEVEL CONTRACT
+   This module owns exactly three things on [data-tilt]:
+       rotate        the tilt itself, as a single axis-angle
+       translate     the hover lift
+       --tilt-*      every custom property namespaced here
+   It never writes transform, scale, position, filter or opacity on
+   [data-tilt]. Those belong to the scroll-stacking module. CSS individual
+   transform properties compose independently (translate, then rotate, then
+   scale, then transform), so the two modules can drive the same element in
+   the same frame without touching each other's values.
+
+   Why `rotate` and not `transform`: the shorthand would wipe the stacking
+   module's matrix. The cost is that `rotate` takes ONE axis-angle, not a
+   rotateX/rotateY pair, so tilt.js composes the two rotations as a unit
+   quaternion and emits `x y z <angle>deg`. See js/tilt.js.
+
+   Why perspective lives on the container: a card cannot carry its own
+   `perspective` here, because that is only reachable through `transform`.
+   The parent holds it instead, and tilt.js slides `perspective-origin` onto
+   the centre of whichever card is hovered, so a card at the bottom of a
+   six-row list is projected as squarely as one at the top.
+
+   Nothing in this file does anything until tilt.js adds .tilt-on to the
+   container. No JS, no pointer, no motion: no perspective, no glare, no
+   listeners, and no cost.
+
+   Depends on: css/tokens.css for every value, and on css/main.css for the
+   card's radius, border and padding, none of which are restated here.
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   Registered custom properties
+
+   Registration buys two things. Typed values, so `calc(number * length)`
+   resolves; and `inherits: false` on the two properties no descendant reads,
+   so a per-frame write does not invalidate the card's subtree.
+
+   --tilt-amp must inherit: the child elements read it to compute their own
+   depth. --tilt-mx / --tilt-my are read only by the card's own background,
+   so they stay non-inheriting and a per-frame write costs the subtree
+   nothing.
+   -------------------------------------------------------------------------- */
+@property --tilt-rot {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --tilt-amp {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --tilt-mx {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --tilt-my {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --tilt-ox {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --tilt-oy {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+
+
+/* --------------------------------------------------------------------------
+   Authored knobs
+
+   These are the tuning surface. tilt.js reads --tilt-max off the first card
+   in each container at init, so the rotation ceiling is set here in CSS, not
+   hardcoded in script. Everything else is consumed by the rules below.
+   -------------------------------------------------------------------------- */
+[data-tilt] {
+  /* Peak rotation in degrees, unitless so JS can parseFloat it.
+     11 matches the reference primitive's default rotationFactor. */
+  --tilt-max: 11;
+
+  /* Hover lift. One space step, upward. */
+  --tilt-lift: calc(var(--s-1) * -1);
+
+  /* Glare radius. Derived from the content container so the soft edge of
+     the light always falls outside the card and never draws a visible
+     circle boundary across it. */
+  --tilt-glare-size: calc(var(--container) / 2.4);
+
+  /* Glare tint, dark theme. --text is the lightest token on this surface,
+     so the light source is the same near-white as the type. */
+  --tilt-glare-tint: var(--text);
+  --tilt-glare-peak: 10%;
+
+  /* How far each child floats toward the viewer at full engagement.
+     The title leads, the status pill follows, the blurb barely moves, so
+     the card reads as layered rather than as one rotating plane. */
+  --tilt-z-status: var(--s-3);
+  --tilt-z-title:  var(--s-5);
+  --tilt-z-blurb:  var(--s-2);
+}
+
+/* Light theme -------------------------------------------------------------
+   A near-white glare over a #f5f5f7 page is invisible, and these cards are
+   transparent, so there is no card fill for a white highlight to sit on.
+   The light theme therefore reads the glare as a glossy reflection in the
+   site accent instead of as a white lamp. Same gesture, same geometry, a
+   tint that actually has somewhere to go.
+
+   No mix-blend-mode in either theme. The cards are transparent over a live
+   canvas background, so `screen` or `plus-lighter` would blend the glare
+   into the moving contour lines behind the card rather than into the card,
+   and the effect would change character as the terrain drifted underneath.
+   Straight alpha compositing keeps it stable. It also avoids forcing the
+   card into its own blending pass every frame.
+   ------------------------------------------------------------------------- */
+[data-theme="light"] [data-tilt] {
+  --tilt-glare-tint: var(--accent);
+  --tilt-glare-peak: 12%;
+}
+
+
+/* --------------------------------------------------------------------------
+   The tilt itself — pointer devices only
+
+   Touch and coarse pointers never match this query, and tilt.js gates its
+   listeners on the same query, so those devices get neither the styles nor
+   the events.
+   -------------------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+
+  /* Container: holds the projection. --tilt-ox / --tilt-oy are moved by JS
+     onto the hovered card's centre. The transition covers the case where
+     the pointer crosses from one card straight to the next while the first
+     is still springing home, so the outgoing card's projection eases across
+     instead of snapping. */
+  .tilt-on {
+    perspective: var(--container);
+    perspective-origin: var(--tilt-ox) var(--tilt-oy);
+    transition: perspective-origin var(--dur-base) var(--ease-spring);
+  }
+
+  /* Card: rotation and lift only.
+     --tilt-rot arrives from JS as a full `x y z <angle>deg` axis-angle and
+     falls back to `none` before the first pointer event, so an untouched
+     card is genuinely unrotated rather than rotated by zero. */
+  .tilt-on [data-tilt] {
+    transform-style: preserve-3d;
+    rotate: var(--tilt-rot, none);
+    translate: 0 calc(var(--tilt-amp) * var(--tilt-lift));
+  }
+
+  /* Promoted only while a card is actually in flight. tilt.js adds the class
+     on wake and strips it the frame the springs reach rest, so six idle
+     cards are never sitting on six compositor layers. */
+  .tilt-on [data-tilt].is-tilting {
+    will-change: rotate, translate;
+  }
+
+  /* Glare -----------------------------------------------------------------
+     A soft radial light tracking the pointer, painted as the card's own
+     `background-image`.
+
+     NOT a ::after pseudo-element, deliberately. css/stack.css claims the
+     scrim on [data-stack-item]::after, and an element only has one ::after.
+     Sharing it would merge the two rule sets onto a single box, and the
+     scrim's `opacity: calc(var(--stack-depth) * var(--stack-dim))` resolves
+     to 0 on any card that is not currently buried, which is exactly the card
+     the pointer is on. The glare would vanish with no error anywhere.
+
+     `background-image` is free: main.css gives .post a `background-color`
+     and no image, and the stacking module's contract claims background-COLOR
+     only. The two compose, image over colour, and the scrim still paints on
+     top of both when a card is buried, so a buried card's glare is dimmed
+     along with everything else. That is the correct result.
+
+     The reveal is baked into the gradient's own alpha via --tilt-amp rather
+     than done with opacity, which keeps this module out of the stacking
+     module's property and avoids a second compositing layer.
+
+     The background sits on the card's own plane at z = 0 while the text
+     floats in front of it, which is both what a reflection on a surface does
+     and the reason the glare can never wash out the type. Even in the
+     flattened fallback, a 10-12% tint leaves every string clearing WCAG AA
+     in both themes.
+
+     Backgrounds are clipped to the border box's radius, so the light reaches
+     the card's real edge and stops there. --------------------------------- */
+  /* Composed as two layers, glare over tint. css/stack.css also paints a
+     background-image on these same cards (its hover tint), and a bare
+     declaration here would silently replace it. --stack-tint-layer is the
+     layer that module exposes; `none` keeps this rule correct on pages where
+     the stacking module is not loaded at all. */
+  .tilt-on [data-tilt] {
+    background-image:
+      radial-gradient(
+        circle var(--tilt-glare-size) at var(--tilt-mx) var(--tilt-my),
+        color-mix(
+          in srgb,
+          var(--tilt-glare-tint) calc(var(--tilt-amp) * var(--tilt-glare-peak)),
+          transparent
+        ) 0%,
+        transparent 68%
+      ),
+      var(--stack-tint-layer, none);
+  }
+
+  /* Depth -----------------------------------------------------------------
+     The card cannot take a transform, so the parallax is done by pushing its
+     children along z inside the card's preserve-3d space. They ride the same
+     --tilt-amp spring the glare does, so there is exactly one source of
+     smoothing in the module and nothing needs its own transition.
+
+     The status pill also takes a small counter-rotation as it floats, which
+     is the one bit of play in the whole interaction. It is the `rotate`
+     property on a child, still inside this module's lane. ----------------- */
+  .tilt-on [data-tilt] > .post-status {
+    translate: 0 0 calc(var(--tilt-amp) * var(--tilt-z-status));
+    rotate: calc(var(--tilt-amp) * -2deg);
+  }
+
+  .tilt-on [data-tilt] > .post-title {
+    translate: 0 0 calc(var(--tilt-amp) * var(--tilt-z-title));
+  }
+
+  .tilt-on [data-tilt] > .post-blurb {
+    translate: 0 0 calc(var(--tilt-amp) * var(--tilt-z-blurb));
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+
+   Two independent switches, matching how the rest of the site reads them:
+
+     - the OS preference, which applies unless the visitor has explicitly
+       chosen full motion with the site toggle (app.js writes data-motion
+       and calls it the single source of truth, so an explicit "full" has
+       to outrank the OS here too);
+     - data-motion="reduced", which always wins.
+
+   tilt.js evaluates exactly this logic and, when either fires, detaches
+   every listener, clears every written property and drops .tilt-on, which
+   already makes the whole block above inert. These rules are the safety net
+   for the frame between a preference flip and the script reacting to it,
+   and for the case where the stylesheet loads without the script.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) .tilt-on {
+    perspective: none !important;
+    transition: none !important;
+  }
+
+  :root:not([data-motion="full"]) [data-tilt],
+  :root:not([data-motion="full"]) [data-tilt] > .post-status,
+  :root:not([data-motion="full"]) [data-tilt] > .post-title,
+  :root:not([data-motion="full"]) [data-tilt] > .post-blurb {
+    rotate: none !important;
+    translate: none !important;
+    transform-style: flat !important;
+    will-change: auto !important;
+  }
+
+  :root:not([data-motion="full"]) [data-tilt] {
+    background-image: none !important;
+  }
+}
+
+:root[data-motion="reduced"] .tilt-on {
+  perspective: none !important;
+  transition: none !important;
+}
+
+:root[data-motion="reduced"] [data-tilt],
+:root[data-motion="reduced"] [data-tilt] > .post-status,
+:root[data-motion="reduced"] [data-tilt] > .post-title,
+:root[data-motion="reduced"] [data-tilt] > .post-blurb {
+  rotate: none !important;
+  translate: none !important;
+  transform-style: flat !important;
+  will-change: auto !important;
+}
+
+:root[data-motion="reduced"] [data-tilt] {
+  background-image: none !important;
+}

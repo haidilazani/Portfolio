@@ -50,9 +50,19 @@
   /* Minimum touch target: 2.75rem = 44px. */
   --tap: calc(var(--s-6) + var(--s-3));
 
-  /* Navigation heights. */
-  --nav-h: calc(var(--s-7) + var(--s-3));   /* 3.75rem */
-  --nav-h-compact: var(--s-7);              /* 3rem, .is-scrolled */
+  /* Navigation island. The capsule floats --island-top below the viewport
+     edge and is one tap target tall plus --island-pad above and below.
+     The -compact values are its tucked-in, scrolled state. */
+  --island-top: var(--s-3);
+  --island-top-compact: var(--s-2);
+  --island-pad: var(--s-1);
+  --island-pad-compact: calc(var(--s-1) * 0.5);
+  --island-gap: clamp(var(--s-3), 3.2vw, var(--s-7));
+  --island-gap-compact: var(--s-2);
+
+  /* Space the fixed nav reserves at the top of the page. */
+  --nav-h: calc(var(--island-top) + var(--tap) + var(--island-pad) * 2);                         /* 4rem */
+  --nav-h-compact: calc(var(--island-top-compact) + var(--tap) + var(--island-pad-compact) * 2); /* 3.5rem, .is-scrolled */
 
   /* Grid column floor for auto-fitting card grids: 16rem. */
   --col-min: calc(var(--s-11) + var(--s-8));
@@ -491,7 +501,7 @@ main > .section:first-child {
    content show through as mud, so every glass surface goes solid. */
 @supports not (backdrop-filter: blur(1px)) {
   .glass,
-  .site-nav.is-scrolled,
+  .nav-inner,
   .cmdk-panel,
   .cmdk,
   .lightbox {
@@ -561,47 +571,92 @@ main > .section:first-child {
 
 
 /* ==========================================================================
-   08  Navigation shell
+   08  Navigation shell — the island
+   --------------------------------------------------------------------------
+   The nav is a floating capsule after Apple's Dynamic Island, dressed in a
+   CSS approximation of Liquid Glass. The <header> is only a full-width,
+   click-through strip that centres it; .nav-inner is the island itself.
+
+   At the top of the page the island sits a little lower and looser. Once the
+   page scrolls (.is-scrolled, set by app.js) it tucks up and draws its three
+   groups together on a spring that overshoots slightly, the island's elastic
+   morph. Its width is always its content's width, so the morph animates gap
+   and padding, which every browser can interpolate, rather than width.
+
+   Over an inverse band app.js adds .is-inverted and home.css re-points the
+   palette, so the glass takes its tone from what sits beneath it.
    ========================================================================== */
 .site-nav {
   position: fixed;
   inset-block-start: 0;
   inset-inline: 0;
   z-index: var(--z-nav);
-  /* Transparent at the top of the page so the hero reads full-bleed. The
-     glass only materialises once there is content to sit above. */
-  background-color: transparent;
-  border-block-end: var(--hairline) solid transparent;
-  transition:
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    backdrop-filter var(--dur-base) var(--ease-out);
+  display: flex;
+  justify-content: center;
+  padding-block-start: var(--island-top);
+  pointer-events: none;
+  transition: padding-block-start var(--dur-morph) var(--ease-island);
 }
 
 .site-nav.is-scrolled {
-  background-color: var(--glass-bg-solid);
-  border-block-end-color: var(--border);
-  box-shadow: inset 0 var(--hairline) 0 var(--glass-border);
-  backdrop-filter: blur(var(--blur)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  padding-block-start: var(--island-top-compact);
 }
 
 .nav-inner {
+  --pad: var(--island-pad);
+
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--s-4);
-  width: 100%;
-  max-width: var(--container);
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-  min-height: var(--nav-h);
-  transition: min-height var(--dur-base) var(--ease-spring);
+  gap: var(--island-gap);
+  max-width: calc(100% - var(--gutter) * 2);
+  padding-block: var(--pad);
+  padding-inline: calc(var(--pad) + var(--s-4)) var(--pad);
+  border-radius: var(--r-pill);
+  color: var(--text);
+  background-color: var(--island-bg);
+  background-image: linear-gradient(to bottom, var(--island-sheen), transparent 60%);
+  box-shadow:
+    var(--island-shadow),
+    inset 0 calc(var(--s-2) * -1) var(--s-4) calc(var(--s-3) * -1) var(--island-sheen);
+  backdrop-filter: blur(var(--blur)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(190%);
+  pointer-events: auto;
+  transition:
+    gap var(--dur-morph) var(--ease-island),
+    padding var(--dur-morph) var(--ease-island),
+    border-radius var(--dur-morph) var(--ease-island),
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+/* Specular rim: a 1px ring whose light pools at the top-left and
+   bottom-right, the way Liquid Glass catches light on a curved edge, over a
+   faint base ring that keeps the edge legible on any background. Masked to
+   the ring so it never tints the fill. */
+.nav-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: var(--hairline);
+  border-radius: inherit;
+  background:
+    radial-gradient(40% 160% at 0% 0%, var(--island-rim), transparent 70%),
+    radial-gradient(40% 160% at 100% 100%, var(--island-rim), transparent 70%),
+    linear-gradient(var(--island-rim-soft), var(--island-rim-soft));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .site-nav.is-scrolled .nav-inner {
-  min-height: var(--nav-h-compact);
+  --pad: var(--island-pad-compact);
+  gap: var(--island-gap-compact);
 }
 
 /* Logo --------------------------------------------------------------------- */
@@ -1825,20 +1880,41 @@ textarea.field-input {
    to restructure rather than reflow.
    ========================================================================== */
 
-/* Below 44em the logo, actions and four links cannot share one line at 320px
-   without clipping, so the links drop to a second row. They stay one line
-   (measured at 320px with --fs-xs they fit inside the gutter) and the row can
-   scroll horizontally as a safety net for longer labels. */
-@media (max-width: 43.99em) {
-  :root {
-    --nav-h: calc(var(--s-9) + var(--s-4));
-    --nav-h-compact: var(--s-9);
+/* Below 48em the one-line island only fits once the search trigger drops
+   its shortcut hint. The trigger keeps its accessible name, and below 44em
+   the hint is meaningless anyway: that range is touch, without a keyboard. */
+@media (max-width: 47.99em) {
+  .cmdk-trigger kbd {
+    display: none;
   }
 
-  .nav-inner {
+  .cmdk-trigger {
+    padding-inline: var(--s-3);
+  }
+}
+
+/* Below 44em the logo, actions and four links cannot share one line at 320px
+   without clipping, so the links drop to a second row and the island opens
+   out from a capsule into the rounded slab of an expanded Dynamic Island,
+   its radius kept concentric with the pills inside. The links stay one line
+   and the row can scroll horizontally as a safety net for longer labels. */
+@media (max-width: 43.99em) {
+  :root {
+    --island-top: var(--s-2);
+    --island-top-compact: var(--s-2);
+    --nav-h: calc(var(--island-top) + var(--tap) * 2 + var(--s-1) + var(--island-pad) * 2);
+    --nav-h-compact: calc(var(--island-top-compact) + var(--tap) * 2 + var(--s-1) + var(--island-pad-compact) * 2);
+  }
+
+  .nav-inner,
+  .site-nav.is-scrolled .nav-inner {
     flex-wrap: wrap;
-    padding-block: var(--s-2);
-    row-gap: var(--s-1);
+    justify-content: space-between;
+    width: 100%;
+    max-width: calc(100% - var(--s-3) * 2);
+    gap: var(--s-1) var(--s-2);
+    padding-inline: calc(var(--pad) + var(--s-3)) var(--pad);
+    border-radius: calc(var(--tap) * 0.5 + var(--pad));
   }
 
   .nav-logo {
@@ -1849,10 +1925,13 @@ textarea.field-input {
     order: 2;
   }
 
+  /* The row starts a link's padding early so "Work" lines up under the logo,
+     and ends as far in from the right edge, so the row sits centred. */
   .nav-links {
     order: 3;
-    flex-basis: 100%;
-    justify-content: flex-start;
+    flex-basis: calc(100% + var(--s-1));
+    margin-inline-start: calc(var(--s-2) * -1);
+    justify-content: space-between;
     gap: 0;
     overflow-x: auto;
     scrollbar-width: none;
@@ -1866,16 +1945,6 @@ textarea.field-input {
   .nav-links a {
     padding-inline: var(--s-2);
     font-size: var(--fs-xs);
-  }
-
-  /* The trigger keeps its accessible name but loses the shortcut hint, which
-     is meaningless without a keyboard. */
-  .cmdk-trigger kbd {
-    display: none;
-  }
-
-  .cmdk-trigger {
-    padding-inline: var(--s-3);
   }
 }
 
@@ -1956,7 +2025,7 @@ textarea.field-input {
    blur goes away and every glass surface becomes an opaque panel. */
 @media (prefers-reduced-transparency: reduce) {
   .glass,
-  .site-nav.is-scrolled,
+  .nav-inner,
   .cmdk,
   .cmdk-panel,
   .lightbox {

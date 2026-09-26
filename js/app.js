@@ -341,9 +341,27 @@
     function initNavState() {
         const nav = document.querySelector('.site-nav');
         if (!nav) return;
+        const island = nav.querySelector('.nav-inner');
+        /* Liquid glass takes its tone from what sits beneath it: while the
+           island floats over an inverse band it wears that band's palette. */
+        const bands = Array.prototype.slice.call(document.querySelectorAll('.band--invert'));
         let scrolled = false;
+        let inverted = false;
         const update = coalesce(function () {
             const y = window.scrollY || window.pageYOffset || 0;
+            let over = false;
+            if (island && bands.length) {
+                const box = island.getBoundingClientRect();
+                const probe = box.top + box.height / 2;
+                over = bands.some(function (band) {
+                    const r = band.getBoundingClientRect();
+                    return r.top <= probe && r.bottom > probe;
+                });
+            }
+            if (over !== inverted) {
+                inverted = over;
+                nav.classList.toggle('is-inverted', inverted);
+            }
             /* Hysteresis so the compact state cannot flicker on a hairline. */
             const next = scrolled ? y > 8 : y > 24;
             if (next === scrolled) return;
@@ -351,6 +369,7 @@
             nav.classList.toggle('is-scrolled', scrolled);
         });
         window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update, { passive: true });
         update();
     }
 

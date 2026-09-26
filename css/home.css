@@ -56,7 +56,10 @@
     color var(--dur-slow) var(--ease-out);
 }
 
-.band--invert {
+/* The nav island joins the inverse palette while it floats over an inverse
+   band (app.js toggles .is-inverted), so its glass stays legible on both. */
+.band--invert,
+.site-nav.is-inverted {
   --bg:             var(--inv-bg);
   --bg-elevated:    var(--inv-bg-elevated);
   --bg-sunken:      var(--inv-bg-sunken);
@@ -73,6 +76,11 @@
   --danger:         var(--inv-danger);
   --danger-text:    var(--inv-danger-text);
   --danger-soft:    var(--inv-danger-soft);
+  --island-bg:        var(--inv-island-bg);
+  --island-sheen:     var(--inv-island-sheen);
+  --island-rim:       var(--inv-island-rim);
+  --island-rim-soft:  var(--inv-island-rim-soft);
+  --island-shadow:    var(--inv-island-shadow);
 
   color-scheme: var(--inv-scheme);
 }

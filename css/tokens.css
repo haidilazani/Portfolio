@@ -49,6 +49,22 @@
   --glass-border:   rgba(255, 255, 255, 0.12);
   --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.45);
 
+  /* Island ---------------------------------------------------------------- */
+  /* The nav capsule's glass. A tinted fill, a sheen that lenses its top
+     half, a specular rim that pools light on the top-left and bottom-right
+     edges, and a faint base ring so the edge never disappears. The --inv-
+     twins are what the island wears over an inverse band (see home.css). */
+  --island-bg:          rgba(22, 22, 26, 0.62);
+  --island-sheen:       rgba(255, 255, 255, 0.10);
+  --island-rim:         rgba(255, 255, 255, 0.38);
+  --island-rim-soft:    rgba(255, 255, 255, 0.09);
+  --island-shadow:      0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.24);
+  --inv-island-bg:        rgba(255, 255, 255, 0.72);
+  --inv-island-sheen:     rgba(255, 255, 255, 0.60);
+  --inv-island-rim:       rgba(255, 255, 255, 0.95);
+  --inv-island-rim-soft:  rgba(0, 0, 0, 0.08);
+  --inv-island-shadow:    0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+
   /* Danger ---------------------------------------------------------------- */
   /* NOT in contract §2. Added because §4 requires "real error + status
      styling" on .contact-form and §2 ships no error colour. Same split as
@@ -116,6 +132,18 @@
   --glass-bg-solid: rgba(255, 255, 255, 0.78);
   --glass-border:   rgba(255, 255, 255, 0.65);
   --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.10);
+
+  /* Island */
+  --island-bg:          rgba(255, 255, 255, 0.72);
+  --island-sheen:       rgba(255, 255, 255, 0.60);
+  --island-rim:         rgba(255, 255, 255, 0.95);
+  --island-rim-soft:    rgba(0, 0, 0, 0.08);
+  --island-shadow:      0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  --inv-island-bg:        rgba(22, 22, 26, 0.62);
+  --inv-island-sheen:     rgba(255, 255, 255, 0.10);
+  --inv-island-rim:       rgba(255, 255, 255, 0.38);
+  --inv-island-rim-soft:  rgba(255, 255, 255, 0.09);
+  --inv-island-shadow:    0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.24);
 
   /* Danger */
   --danger:         #d70015;
@@ -237,9 +265,12 @@
   /* Exponential ease-out: the long, confident settle of the home page's
      roller, reveals and marquee hand-offs. */
   --ease-expo:   cubic-bezier(0.19, 1, 0.22, 1);
+  /* A spring with a small overshoot: the nav island's elastic morph. */
+  --ease-island: cubic-bezier(0.34, 1.32, 0.64, 1);
   --dur-fast:    160ms;
   --dur-base:    280ms;
   --dur-slow:    600ms;
+  --dur-morph:   520ms;
   --dur-reveal:  700ms;
   --dur-roll:    900ms;
 

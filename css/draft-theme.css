@@ -1,0 +1,1789 @@
+/* ==========================================================================
+   draft-theme.css - the "Apple x The Neighbourhood" draft layer
+   --------------------------------------------------------------------------
+   Linked LAST (after tokens, main, stack, tilt, hero, home) by the three draft
+   pages only: draft-index.html, draft-about.html, draft-blog.html. No original
+   page links this file, so deleting it (and the drafts) restores the site.
+
+   Mood: Apple product-page restraint (huge confident type, generous space,
+   calm motion) crossed with The Neighbourhood (monochrome, grainy,
+   stage-lit, cinematic). Colour appears only as LIGHT: orange and gold are
+   light sources (terrain peaks, soundwave, CTA, focus), crimson is only
+   atmosphere (glow, vignette, shadow) and never carries text.
+
+   Sections
+     0  Palette primitives + semantic token overrides (both themes)
+     1  Base: focus ring, selection, film grain, brand marks, page glow
+     2  Buttons, pill links, text links (gold CTA)
+     3  Nav island, hidden theme toggle
+     4  Intro overlay (draft-index): lock, stage lights, copy, soundwave
+     5  Hero (draft-index): ambient edges, teaser, CTAs
+     6  Home: the selected-work grid
+     7  About: head, TL;DR, The Stack, Off-Screen
+     8  Writing: editorial index + accordion
+     9  Motion gating, contrast, print
+
+   Contract notes for anyone editing this file
+     - --accent and --border MUST stay plain hex / rgba: js/hero.js reads
+       them off <html> and parses them for the terrain canvas (no color-mix,
+       no var()).
+     - Every animation below is gated twice: @media (prefers-reduced-motion)
+       AND html[data-motion="reduced"] (main.css also has a global 1ms kill
+       switch under both).
+     - z-index only from the layer tokens (--z-*).
+   ========================================================================== */
+
+
+/* ---- 0. Palette primitives + semantic overrides ------------------------- */
+
+/* Three selectors on purpose: js/app.js flips <html data-theme> to "light"
+   when the OS is light and nothing is stored, and [data-theme="light"] in
+   tokens.css has the same specificity as :root. The attribute variants here
+   are (0,2,0), so the draft palette wins in both themes and a light-mode Mac
+   still gets the dark stage. */
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"] {
+  color-scheme: dark;
+
+  /* The five brand colours, declared once. */
+  --pitch:      #050505;   /* background                                   */
+  --crimson:    #4A0A05;   /* ambient glow + shadow; decoration only (1.30:1) */
+  --orange:     #FF4500;   /* highlights, soundwave, terrain peaks (5.92:1)   */
+  --gold:       #FFB300;   /* CTA buttons, accents, focus ring (11.36:1)      */
+  --soft-white: #F2F2F2;   /* typography (18.21:1)                            */
+
+  /* Surfaces */
+  --bg:            #050505;                                              /* = --pitch */
+  --bg-elevated:   color-mix(in srgb, var(--crimson) 22%, var(--pitch)); /* ~#140605  */
+  --bg-sunken:     color-mix(in srgb, #000 50%, var(--pitch));
+  --surface:       color-mix(in srgb, var(--soft-white) 4.5%, transparent);
+  --surface-hover: color-mix(in srgb, var(--soft-white) 8%, transparent);
+
+  /* Text: Soft White, then Soft White at reduced opacity (ratios on --pitch). */
+  --text:           var(--soft-white);                                    /* 18.2:1 */
+  --text-secondary: color-mix(in srgb, var(--soft-white) 70%, transparent); /* ~8.9:1 */
+  --text-tertiary:  color-mix(in srgb, var(--soft-white) 58%, transparent); /* ~6.2:1 */
+
+  /* Accent. Fill = orange light; accent-coloured TEXT = gold (never white
+     on orange, never text on crimson). Literal values: hero.js parses them. */
+  --accent:      #FF4500;
+  --accent-text: #FFB300;
+  --accent-soft: rgba(255, 69, 0, 0.16);
+  --accent-2:    #FFB300;
+  --border:        rgba(242, 242, 242, 0.10);
+  --border-strong: rgba(242, 242, 242, 0.22);
+
+  --danger:      #ff453a;
+  --danger-text: #ff6961;
+  --danger-soft: rgba(255, 69, 58, 0.12);
+
+  /* CTA pair: gold fill, pitch label (11.36:1, AAA). */
+  --cta-bg:       var(--gold);
+  --cta-bg-hover: color-mix(in srgb, var(--gold) 86%, var(--soft-white));
+  --cta-text:     var(--pitch);
+  --cta-glow:     color-mix(in srgb, var(--gold) 30%, transparent);
+  --gold-soft:    color-mix(in srgb, var(--gold) 12%, transparent);
+  --gold-line:    color-mix(in srgb, var(--gold) 55%, transparent);
+
+  /* One focus ring for the drafts: gold, with a soft halo over glass. */
+  --focus-ring: var(--gold);
+  --focus-halo: color-mix(in srgb, var(--gold) 22%, transparent);
+
+  /* Stage light. Crimson walls, orange + gold spots. */
+  --glow-crimson:      color-mix(in srgb, var(--crimson) 88%, transparent);
+  --glow-crimson-soft: color-mix(in srgb, var(--crimson) 50%, transparent);
+  --glow-orange:       color-mix(in srgb, var(--orange) 30%, transparent);
+  --glow-orange-soft:  color-mix(in srgb, var(--orange) 13%, transparent);
+  --glow-gold-soft:    color-mix(in srgb, var(--gold) 9%, transparent);
+  --beam-orange:       color-mix(in srgb, var(--orange) 9%, transparent);
+  --beam-gold:         color-mix(in srgb, var(--gold) 7%, transparent);
+
+  /* The classic-scrollbar gutter beside the intro (section 4): the mid
+     tone of the overlay's crimson right wall. */
+  --intro-gutter:      color-mix(in srgb, var(--crimson) 80%, var(--pitch)); /* ~#3C0905 */
+
+  /* Glass: dark, faintly warm. */
+  --glass-bg:       color-mix(in srgb, var(--bg-elevated) 60%, transparent);
+  --glass-bg-solid: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+  --glass-border:   color-mix(in srgb, var(--soft-white) 12%, transparent);
+  --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.55);
+
+  --island-bg:       rgba(22, 8, 6, 0.62);
+  --island-sheen:    rgba(242, 242, 242, 0.09);
+  --island-rim:      rgba(242, 242, 242, 0.32);
+  --island-rim-soft: rgba(242, 242, 242, 0.08);
+  --island-shadow:   0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  /* Inverse bands stay dark. A faint crimson lift keeps the home page's
+     band rhythm without ever leaving the palette. */
+  --inv-scheme:          dark;
+  --inv-bg:              color-mix(in srgb, var(--crimson) 14%, var(--pitch)); /* ~#0F0605 */
+  --inv-bg-elevated:     color-mix(in srgb, var(--crimson) 26%, var(--pitch));
+  --inv-bg-sunken:       var(--bg-sunken);
+  --inv-surface:         color-mix(in srgb, var(--soft-white) 5%, transparent);
+  --inv-surface-hover:   color-mix(in srgb, var(--soft-white) 9%, transparent);
+  --inv-text:            var(--soft-white);
+  --inv-text-secondary:  color-mix(in srgb, var(--soft-white) 70%, transparent);
+  --inv-text-tertiary:   color-mix(in srgb, var(--soft-white) 58%, transparent);
+  --inv-accent:          #FF4500;
+  --inv-accent-text:     #FFB300;
+  --inv-accent-soft:     rgba(255, 69, 0, 0.16);
+  --inv-border:          rgba(242, 242, 242, 0.10);
+  --inv-border-strong:   rgba(242, 242, 242, 0.22);
+  --inv-danger:          #ff453a;
+  --inv-danger-text:     #ff6961;
+  --inv-danger-soft:     rgba(255, 69, 58, 0.12);
+  --inv-island-bg:       var(--island-bg);
+  --inv-island-sheen:    var(--island-sheen);
+  --inv-island-rim:      var(--island-rim);
+  --inv-island-rim-soft: var(--island-rim-soft);
+  --inv-island-shadow:   var(--island-shadow);
+
+  --paper: var(--soft-white);
+
+  /* Draft-only rhythm, measure and motion tokens. */
+  --measure-editorial: 64ch;                 /* Writing prose            */
+  --measure-tldr:      52ch;                 /* About TL;DR block        */
+  --fs-tldr:           clamp(1.25rem, 1.9vw, 1.625rem);
+  --editorial-w:       calc(var(--s-11) * 4.5); /* 54rem writing column  */
+  --section-y-draft:   calc(var(--section-y) * 1.2);
+  --intro-fade:        900ms;                /* keep in sync with FADE_MS in js/draft-intro.js */
+  --ease-wave:         cubic-bezier(0.45, 0, 0.55, 1);
+  --wave-bar:          calc(var(--hairline) * 3);
+  --grain-opacity:     0.06;
+  --photo-noir:        grayscale(1) contrast(1.12);
+}
+
+/* Browsers without color-mix() (Safari < 16.2) treat every token above that
+   uses it as invalid, and a background falls back to transparent: the gold
+   CTA would lose its fill on hover (pitch label on pitch) and the command
+   palette panel would have none. The same values, precomputed. */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    --bg-elevated:         #140605;
+    --surface:             rgba(242, 242, 242, 0.045);
+    --surface-hover:       rgba(242, 242, 242, 0.08);
+    --text-secondary:      rgba(242, 242, 242, 0.70);
+    --text-tertiary:       rgba(242, 242, 242, 0.58);
+    --cta-bg-hover:        #FDBC22;
+    --gold-soft:           rgba(255, 179, 0, 0.12);
+    --gold-line:           rgba(255, 179, 0, 0.55);
+    --glass-bg:            rgba(20, 6, 5, 0.60);
+    --glass-bg-solid:      rgba(20, 6, 5, 0.82);
+    --glass-border:        rgba(242, 242, 242, 0.12);
+    --inv-bg:              #0F0605;
+    --inv-bg-elevated:     #170605;
+    --inv-surface:         rgba(242, 242, 242, 0.05);
+    --inv-surface-hover:   rgba(242, 242, 242, 0.09);
+    --inv-text-secondary:  rgba(242, 242, 242, 0.70);
+    --inv-text-tertiary:   rgba(242, 242, 242, 0.58);
+    --intro-gutter:        #3C0905;
+  }
+}
+
+
+/* ---- 1. Base ------------------------------------------------------------ */
+
+/* The drafts use Jost as the display voice everywhere below the nav (the
+   home page already does); the shared nav keeps Space Grotesk. */
+.draft main,
+.draft .site-footer,
+.draft .intro {
+  --font-display: var(--font-poster);
+}
+
+:focus-visible {
+  outline-color: var(--focus-ring);
+}
+
+.glass :focus-visible,
+.site-nav :focus-visible,
+.cmdk-panel :focus-visible,
+.lightbox :focus-visible {
+  box-shadow: 0 0 0 calc(var(--s-1) + 2px) var(--focus-halo);
+}
+
+/* Brand marks: the dot is a light source, so it is orange. */
+.nav-logo span,
+.practice-logo > span {
+  color: var(--orange);
+}
+
+/* Film grain. One static, tiled SVG noise layer over everything except the
+   command palette (z-modal). Static on purpose: animated grain repaints
+   every frame. pointer-events: none, so it can never eat a click. */
+.draft::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.9 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: calc(var(--s-10) * 1.4) auto; /* ~180px tile */
+}
+
+/* Stage glow at the top of a page head (About, Writing): the same light rig
+   as the intro, turned right down. */
+.stage-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.stage-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: min(calc(var(--s-11) * 4), 90svh);
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% -18%, var(--glow-crimson), transparent 72%),
+    radial-gradient(ellipse 34% 40% at 10% -6%, var(--glow-orange-soft), transparent 70%),
+    radial-gradient(ellipse 34% 40% at 90% -6%, var(--glow-gold-soft), transparent 70%);
+}
+
+.draft .page-title {
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+}
+
+.draft .page-title .accent-word {
+  line-height: var(--lh-display);
+}
+
+.draft .eyebrow {
+  color: var(--text-tertiary);
+}
+
+.chapter-no {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* About / Writing footer: main.css draws a full-bleed hairline on
+   .site-footer and a second one on .footer-inner a few rems below it.
+   Keep the container one only, as on the home page. */
+.draft .site-footer:not(.band) {
+  border-block-start: 0;
+}
+
+
+/* ---- 2. Buttons, pill links, text links --------------------------------- */
+
+/* Primary: the one gold object per view. Pitch label on gold, 11.36:1. */
+.btn-primary {
+  background-color: var(--cta-bg);
+  color: var(--cta-text);
+}
+
+.btn-primary:hover {
+  background-color: var(--cta-bg-hover);
+  box-shadow: 0 var(--s-2) var(--s-6) var(--cta-glow);
+}
+
+.btn-primary:active {
+  box-shadow: 0 var(--s-1) var(--s-3) var(--cta-glow);
+}
+
+/* Secondary gold: an outline in gold with gold text (11.36:1). */
+.btn-line {
+  background-color: transparent;
+  border-color: var(--gold-line);
+  color: var(--gold);
+}
+
+.btn-line:hover {
+  border-color: var(--gold);
+  background-color: var(--gold-soft);
+}
+
+.btn-line:active {
+  background-color: color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.btn-outline:hover {
+  border-color: var(--gold);
+  background-color: var(--gold-soft);
+  color: var(--gold);
+}
+
+.btn-ghost:hover {
+  color: var(--gold);
+}
+
+.pill-link--live {
+  background-color: var(--gold-soft);
+  border-color: var(--gold-soft);
+  color: var(--gold);
+}
+
+.pill-link--live:hover {
+  border-color: var(--gold);
+}
+
+.pill-link--repo:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* An inline arrow link: gold text, underline that draws in on hover. */
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: var(--hairline);
+  text-underline-offset: 0.3em;
+  transition:
+    text-decoration-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring);
+}
+
+.text-link svg {
+  width: var(--s-4);
+  height: var(--s-4);
+  flex: none;
+  transition: translate var(--dur-base) var(--ease-spring);
+}
+
+.text-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Hover-capable pointers only: a tap leaves :hover stuck on touch screens. */
+@media (hover: hover) {
+  .text-link:hover svg {
+    translate: calc(var(--hairline) * 3) 0;
+  }
+}
+
+.text-link:active {
+  color: var(--cta-bg-hover);
+}
+
+.text-link:focus-visible {
+  border-radius: var(--r-sm);
+}
+
+
+/* ---- 3. Nav island, theme toggle ---------------------------------------- */
+
+/* Light and dark are the same stage in the drafts, so the theme toggle would
+   do nothing. Hidden, not removed: app.js still finds and syncs it. */
+.draft [data-theme-toggle] {
+  display: none;
+}
+
+.draft .nav-links a[aria-current="page"] {
+  color: var(--text);
+}
+
+/* tilt.css turns the card glare orange under [data-theme="light"] (for a
+   light page). The drafts are dark in both themes, so keep the dark lamp. */
+.draft [data-tilt] {
+  --tilt-glare-tint: var(--text);
+  --tilt-glare-peak: 10%;
+}
+
+
+/* ---- 4. Intro overlay (draft-index.html only) --------------------------- */
+
+/* State lives on <html>:
+     .js-intro       set by the inline <head> gate: overlay up, page locked
+     .intro-ready    js/draft-intro.js has claimed it (otherwise the gate
+                     releases the page on DOMContentLoaded / a timeout)
+     .intro-leaving  the fade is running; the hero entrance plays now
+     .intro-done     finished; the overlay is [hidden]
+   Without .js-intro the overlay is display: none: no JS, no overlay, no trap.
+
+   The lock is a CLASS, never inline style: app.js's command-palette overlay
+   saves and restores html's inline overflow. */
+.intro {
+  display: none;
+}
+
+html.js-intro {
+  overflow: hidden;
+  scrollbar-gutter: stable;   /* classic scrollbars: no jump at unlock */
+  overscroll-behavior: none;  /* no rubber band / pull-to-refresh      */
+}
+
+/* With classic scrollbars (Windows, Linux, macOS with a mouse) that stable
+   gutter lies outside the viewport the fixed overlay covers, and the
+   browser fills it with the root background COLOUR (images are not drawn
+   there): a pitch-black strip down the right edge of the stage. Fill it
+   with the overlay's crimson wall instead, and fade it to the page colour
+   with the overlay, since a real scrollbar takes that strip once the page
+   unlocks. Overlay scrollbars reserve no gutter, so none of this shows. */
+html.js-intro {
+  background-color: var(--intro-gutter);
+  transition: background-color var(--intro-fade) var(--ease-out);
+}
+
+html.js-intro.intro-leaving {
+  background-color: var(--pitch);
+}
+
+html.js-intro body {
+  overflow: hidden;
+}
+
+html.js-intro .intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);  /* 900: over the nav (200), under cmdk (1000) */
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background-color: var(--pitch);
+  color: var(--soft-white);
+  text-align: center;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--intro-fade) var(--ease-out),
+    visibility 0s linear var(--intro-fade);
+}
+
+html.js-intro.intro-leaving .intro {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Stage lights. ::before is the static rig: two soft beams from the
+   rafters crossing toward centre stage, an orange footlight wash, crimson
+   walls closing in, and a dark centre where the words stand. ::after is a
+   hotter edge light that only ever animates its opacity, so the
+   "breathing" never repaints a shadow. */
+html.js-intro .intro::before,
+html.js-intro .intro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+}
+
+html.js-intro .intro::before {
+  background:
+    conic-gradient(from 130deg at 16% -6%, transparent 0deg, var(--beam-orange) 10deg, transparent 20deg, transparent 360deg),
+    conic-gradient(from 210deg at 84% -6%, transparent 0deg, var(--beam-gold) 10deg, transparent 20deg, transparent 360deg),
+    radial-gradient(ellipse 62% 32% at 50% 106%, var(--glow-orange), transparent 74%),
+    radial-gradient(ellipse 34% 50% at 12% -10%, var(--glow-orange-soft), transparent 72%),
+    radial-gradient(ellipse 34% 50% at 88% -10%, var(--glow-gold-soft), transparent 72%),
+    radial-gradient(ellipse 80% 70% at 50% 46%, transparent 46%, var(--glow-crimson-soft) 86%, var(--glow-crimson) 118%);
+  box-shadow: inset 0 0 16vmax var(--glow-crimson);
+}
+
+html.js-intro .intro::after {
+  box-shadow: inset 0 0 22vmax 2vmax var(--glow-orange);
+  opacity: 0.35;
+}
+
+/* The dialog container takes focus on load so it is announced by its label;
+   it is not a control, so it draws no ring. The Enter button inside does. */
+.intro:focus {
+  outline: none;
+}
+
+.intro-stage {
+  position: relative;
+  z-index: var(--z-base);
+  display: grid;
+  justify-items: center;
+  width: min(100%, calc(var(--s-11) * 3.5)); /* 42rem */
+}
+
+/* A faint pool of white light where the performer would stand. */
+.intro-stage::before {
+  content: "";
+  position: absolute;
+  inset: -30% -20%;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--soft-white) 4%, transparent), transparent);
+}
+
+.intro-title {
+  position: relative;
+  z-index: var(--z-base);
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+.intro-line {
+  display: block;
+}
+
+.intro-line--lead {
+  font-size: var(--fs-3xl);
+  font-weight: 500;
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--soft-white);
+}
+
+.intro-line--soft {
+  font-size: var(--fs-xl);
+  font-weight: 400;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-secondary);
+}
+
+/* Soundwave (shared by the intro and the About "Music" card). Bars scale on
+   the compositor only (transform: scaleY); --amp is each bar's resting
+   height, which is also the reduced-motion state. */
+.soundwave {
+  --wave-h: var(--s-8);
+  --wave-gap: calc(var(--hairline) * 4);
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wave-gap);
+  height: var(--wave-h);
+}
+
+.soundwave > span {
+  position: relative;
+  z-index: var(--z-base);
+  flex: none;
+  width: var(--wave-bar);
+  height: 100%;
+  border-radius: var(--r-pill);
+  background-image: linear-gradient(to top, var(--orange), var(--gold) 50%, var(--orange));
+  opacity: var(--o, 1);
+  transform: scaleY(var(--amp, 0.5));
+  transform-origin: 50% 50%;
+}
+
+.intro .soundwave {
+  --wave-h: var(--s-9);
+  margin-block: var(--s-7) var(--s-6);
+}
+
+@media (min-width: 40em) {
+  .intro .soundwave { --wave-gap: calc(var(--hairline) * 6); }
+}
+
+/* Phones in landscape (~320-375px tall): the stack is ~22rem tall and would
+   overflow the centred grid past the padding, clipping the headline. */
+@media (max-height: 28em) {
+  .intro .soundwave {
+    --wave-h: var(--s-7);
+    margin-block: var(--s-5) var(--s-4);
+  }
+
+  .intro-title { gap: var(--s-2); }
+  .intro-hint  { margin-block-start: var(--s-2); }
+}
+
+/* A soft pool of orange light under the bars. */
+.intro .soundwave::before {
+  content: "";
+  position: absolute;
+  inset: -60% -12%;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--glow-orange-soft), transparent);
+}
+
+.intro-enter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding-inline: var(--s-5) var(--s-4);
+  border: var(--hairline) solid var(--gold-line);
+  border-radius: var(--r-pill);
+  background-color: transparent;
+  color: var(--gold);
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  line-height: var(--lh-snug);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring),
+    scale var(--dur-fast) var(--ease-spring);
+}
+
+.intro-enter svg {
+  width: var(--s-4);
+  height: var(--s-4);
+  flex: none;
+}
+
+.intro-enter:hover {
+  border-color: var(--gold);
+  background-color: var(--gold);
+  color: var(--pitch);
+  box-shadow: 0 0 var(--s-7) var(--cta-glow);
+}
+
+.intro-enter:active {
+  scale: 0.97;
+}
+
+.intro-enter:focus-visible {
+  outline-offset: calc(var(--hairline) * 4);
+  border-radius: var(--r-pill);
+}
+
+.intro-hint {
+  margin-block-start: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* Hold the hero's CSS entrance (hero.css hero-rise / hero-fade / marquee)
+   while the overlay is up, so it plays as the overlay fades instead of
+   finishing unseen underneath. */
+html.js-intro:not(.intro-leaving) .hero *,
+html.js-intro:not(.intro-leaving) .hero *::before,
+html.js-intro:not(.intro-leaving) .hero *::after {
+  animation-play-state: paused !important;
+}
+
+@keyframes draft-rise {
+  from { opacity: 0; transform: translate3d(0, var(--s-4), 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes draft-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes draft-breathe {
+  from { opacity: 0.22; }
+  to   { opacity: 0.78; }
+}
+
+@keyframes draft-wave {
+  from { transform: scaleY(calc(var(--amp, 0.5) * 0.16)); }
+  to   { transform: scaleY(var(--amp, 0.5)); }
+}
+
+@keyframes draft-nudge {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 calc(var(--hairline) * 3); }
+}
+
+/* The house lights come up, the words arrive, the band starts. Motion only
+   when both the OS and the site toggle allow it. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="reduced"]).js-intro .intro::before {
+    animation: draft-fade 1600ms var(--ease-out) both;
+  }
+
+  html:not([data-motion="reduced"]).js-intro .intro::after {
+    animation: draft-breathe 6s var(--ease-wave) infinite alternate;
+  }
+
+  html:not([data-motion="reduced"]) .intro-line--lead {
+    animation: draft-rise 1100ms var(--ease-expo) 250ms both;
+  }
+
+  html:not([data-motion="reduced"]) .intro-line--soft {
+    animation: draft-rise 1100ms var(--ease-expo) 650ms both;
+  }
+
+  html:not([data-motion="reduced"]) .intro .soundwave {
+    animation: draft-fade 1400ms var(--ease-out) 950ms both;
+  }
+
+  html:not([data-motion="reduced"]) .intro .soundwave > span {
+    animation: draft-wave var(--d, 1.2s) var(--ease-wave) var(--delay, 0s) infinite alternate;
+  }
+
+  html:not([data-motion="reduced"]) .intro-enter {
+    animation: draft-rise 900ms var(--ease-expo) 1250ms both;
+  }
+
+  html:not([data-motion="reduced"]) .intro-enter svg {
+    animation: draft-nudge 2.4s var(--ease-wave) 2s infinite;
+  }
+
+  html:not([data-motion="reduced"]) .intro-hint {
+    animation: draft-fade 900ms var(--ease-out) 1550ms both;
+  }
+
+  /* "Come closer": the stage drifts toward the viewer as the lights fade. */
+  html:not([data-motion="reduced"]) .intro-stage {
+    transition: transform var(--intro-fade) var(--ease-expo);
+  }
+
+  html:not([data-motion="reduced"]).intro-leaving .intro-stage {
+    transform: scale(1.06);
+  }
+}
+
+
+/* ---- 5. Hero (draft-index.html) ----------------------------------------- */
+
+.draft .hero {
+  --marquee-stroke: color-mix(in srgb, var(--soft-white) 34%, transparent);
+}
+
+/* Layering inside .hero (isolated): canvas + the bg fade at z-canvas, the
+   ambient light at z-base, stage and headline above (hero.css gives them 2
+   and they come later in tree order). */
+.draft .hero::after {
+  z-index: var(--z-canvas);
+}
+
+/* Ambient edges: the intro's rig at about a third of the strength. The
+   mask fades it out before the bottom edge so the next band has no seam. */
+.draft .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 36% 70% at -4% 42%, var(--glow-crimson-soft), transparent 70%),
+    radial-gradient(ellipse 36% 70% at 104% 42%, var(--glow-crimson-soft), transparent 70%),
+    radial-gradient(ellipse 28% 42% at 14% -8%, var(--glow-orange-soft), transparent 70%),
+    radial-gradient(ellipse 28% 42% at 86% -8%, var(--glow-gold-soft), transparent 70%);
+  box-shadow: inset 0 0 9vmax var(--glow-crimson-soft);
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 98%);
+}
+
+.draft .hero-eyebrow {
+  color: var(--text-secondary);
+}
+
+.draft .hero-lede {
+  max-width: 38ch;
+  font-size: var(--fs-lg);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.draft .hero-lede strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* The focus target after the intro: announced, not a control, so no ring.
+   draft-intro.js removes its tabindex again on blur. */
+.draft #hero-title[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.draft .round-btn:hover {
+  border-color: var(--gold);
+  background-color: var(--gold);
+  color: var(--pitch);
+}
+
+
+/* ---- 6. Home: selected-work grid ---------------------------------------- */
+
+.work-showcase {
+  padding-block: var(--section-y-draft);
+  overflow-x: clip;
+}
+
+.showcase-head {
+  display: grid;
+  gap: var(--s-4);
+  max-width: var(--measure);
+  margin-block-end: var(--s-8);
+}
+
+.work-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-8);
+}
+
+.work-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  align-content: start;
+  padding-block-start: var(--s-5);
+  border-block-start: var(--hairline) solid var(--border-strong);
+}
+
+/* A gold rule draws across the top edge on hover / keyboard focus. */
+.work-card::before {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(var(--hairline) * -1);
+  inset-inline: 0;
+  height: calc(var(--hairline) * 2);
+  background-color: var(--gold);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--dur-slow) var(--ease-expo);
+}
+
+.work-card:hover::before,
+.work-card:focus-within::before {
+  transform: scaleX(1);
+}
+
+.work-card-figure {
+  margin: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.work-card-media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background-color: var(--bg-elevated);
+}
+
+/* Media frames get their size from aspect-ratio (or flex), never from the
+   photo: the <picture> is pinned to the frame and the image covers it.
+   (main.css makes <picture> a height:auto block, so a plain height:100% on
+   the img would fall back to the photo's own ratio.) */
+.work-card-media > picture,
+.tldr-portrait > picture,
+.offscreen-media > picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.work-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--photo-noir);
+  transition:
+    filter var(--dur-slow) var(--ease-out),
+    scale var(--dur-slow) var(--ease-expo);
+}
+
+.work-card:hover .work-card-media img,
+.work-card:focus-within .work-card-media img {
+  filter: none;
+  scale: 1.03;
+}
+
+.work-card-caption {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.work-card-body {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+  justify-items: start;
+}
+
+.work-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.work-card-no {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.work-card-title {
+  font-family: var(--font-poster);
+  font-size: var(--fs-title);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.work-card-line {
+  max-width: 44ch;
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.work-card .project-links {
+  padding-block-start: var(--s-1);
+}
+
+/* Tablet: one column, each card laid out horizontally. */
+@media (min-width: 40em) and (max-width: 63.99em) {
+  .work-card {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    column-gap: var(--s-6);
+    align-items: start;
+  }
+}
+
+/* Desktop: three equal columns. */
+@media (min-width: 64em) {
+  .work-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-6);
+  }
+
+  /* The cards stretch to one height; the link row sits on the card floor
+     so the three rows of pills line up whatever the copy above them. */
+  .work-card {
+    grid-template-rows: auto 1fr;
+  }
+
+  .work-card-body {
+    grid-template-rows: repeat(4, auto) 1fr;
+  }
+
+  .work-card .project-links {
+    align-self: end;
+  }
+}
+
+
+/* ---- 7. About (draft-about.html) ---------------------------------------- */
+
+/* Glow sits under the page head; the content is lifted above it. */
+.stage-glow > .container {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+.draft .chapter {
+  padding-block: calc(var(--section-y-draft) * 0.5);
+}
+
+.page-head-inner {
+  display: grid;
+  gap: var(--s-5);
+  justify-items: start;
+  max-width: var(--measure);
+}
+
+/* In-page chapter index: three pills that jump to the three sections. */
+.chapter-nav ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding-inline: var(--s-4);
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 560;
+  color: var(--text);
+  transition:
+    border-color var(--dur-base) var(--ease-spring),
+    background-color var(--dur-base) var(--ease-spring),
+    scale var(--dur-fast) var(--ease-spring);
+}
+
+.chapter-nav .chapter-no {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+}
+
+.chapter-nav a:hover {
+  border-color: var(--gold);
+  background-color: var(--gold-soft);
+}
+
+.chapter-nav a:active {
+  scale: 0.97;
+}
+
+.chapter-nav a:focus-visible {
+  border-radius: var(--r-pill);
+}
+
+/* Each chapter opens on a hairline with its gold number. */
+.chapter-head {
+  display: grid;
+  gap: var(--s-3);
+  max-width: var(--measure);
+  margin-block-end: var(--s-7);
+  padding-block-start: var(--s-5);
+  border-block-start: var(--hairline) solid var(--border);
+}
+
+/* 01 - The TL;DR */
+.tldr-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-7);
+  align-items: start;
+}
+
+@media (min-width: 56em) {
+  .tldr-grid {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    column-gap: var(--s-9);
+    align-items: center;
+  }
+}
+
+.tldr-portrait {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: calc(var(--s-11) * 2); /* 24rem */
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background-color: var(--bg-elevated);
+  box-shadow: 0 var(--s-6) var(--s-10) var(--glow-crimson-soft);
+}
+
+.tldr-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: var(--photo-noir);
+  transition: filter var(--dur-slow) var(--ease-out);
+}
+
+.tldr-portrait:hover img {
+  filter: none;
+}
+
+.tldr-body {
+  display: grid;
+  gap: var(--s-6);
+  justify-items: start;
+  min-width: 0;
+}
+
+.tldr-body .chapter-head {
+  justify-self: stretch;  /* .tldr-body is justify-items: start; without this
+                             the hairline is only as wide as "The TL;DR." */
+  margin-block-end: 0;
+}
+
+.tldr {
+  max-width: var(--measure-tldr);
+  font-size: var(--fs-tldr);
+  font-weight: 400;
+  line-height: 1.42;
+  letter-spacing: -0.012em;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.tldr strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* At a glance: a two-column definition list, hairline rows. */
+.glance {
+  width: 100%;
+  max-width: var(--measure-tldr);
+  margin: 0;
+  border-block-start: var(--hairline) solid var(--border);
+}
+
+.glance > div {
+  display: grid;
+  grid-template-columns: calc(var(--s-10) + var(--s-4)) minmax(0, 1fr);
+  gap: var(--s-4);
+  padding-block: var(--s-3);
+  border-block-end: var(--hairline) solid var(--border);
+}
+
+.glance dt {
+  padding-block-start: 0.2em;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.glance dd {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 29.99em) {
+  .glance > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-1);
+  }
+}
+
+/* The full bio, one click away. */
+.longer {
+  width: 100%;
+  max-width: var(--measure-tldr);
+}
+
+.longer > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: var(--tap);
+  padding-inline: var(--s-4);
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 560;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  transition:
+    border-color var(--dur-base) var(--ease-spring),
+    background-color var(--dur-base) var(--ease-spring),
+    color var(--dur-base) var(--ease-spring),
+    scale var(--dur-fast) var(--ease-spring);
+}
+
+.longer > summary::-webkit-details-marker {
+  display: none;
+}
+
+.longer > summary::after {
+  content: "";
+  width: var(--s-2);
+  height: var(--s-2);
+  border-inline-end: calc(var(--hairline) * 1.5) solid currentColor;
+  border-block-end: calc(var(--hairline) * 1.5) solid currentColor;
+  rotate: 45deg;
+  translate: 0 -25%;
+  transition: rotate var(--dur-base) var(--ease-spring), translate var(--dur-base) var(--ease-spring);
+}
+
+.longer[open] > summary::after {
+  rotate: 225deg;
+  translate: 0 25%;
+}
+
+.longer > summary:hover {
+  border-color: var(--gold);
+  background-color: var(--gold-soft);
+  color: var(--gold);
+}
+
+.longer > summary:active {
+  scale: 0.97;
+}
+
+.longer > summary:focus-visible {
+  border-radius: var(--r-pill);
+}
+
+.longer .prose {
+  margin-block-start: var(--s-5);
+}
+
+/* 02 - The Stack */
+.skill-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--col-min)), 1fr));
+  gap: var(--s-7) var(--s-6);
+}
+
+.skill-group {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+  min-width: 0;
+}
+
+.skill-group-title {
+  position: relative;
+  padding-block-start: var(--s-3);
+  border-block-start: var(--hairline) solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* One gold accent per group: a short rule riding the hairline. */
+.skill-group-title::before {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(var(--hairline) * -1.5);
+  inset-inline-start: 0;
+  width: var(--s-6);
+  height: calc(var(--hairline) * 2);
+  background-color: var(--gold);
+}
+
+/* Not interactive, so no hover: on this site things that move are things
+   you can do. Long labels wrap instead of overflowing at 320px. */
+.skill-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-pills > li {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: calc(var(--s-6) + var(--s-1));
+  padding: var(--s-1) var(--s-3);
+  border: var(--hairline) solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.stack-proof {
+  margin-block-start: var(--s-8);
+  padding-block-start: var(--s-6);
+  border-block-start: var(--hairline) solid var(--border);
+}
+
+/* main.css's proof bar is one row with a divider before each item. Below
+   ~44em the three items wrap, a divider lands at the start of the new row
+   and the figures stop lining up: stack them as one clean column instead. */
+@media (max-width: 43.99em) {
+  .stack-proof {
+    flex-direction: column;
+    row-gap: var(--s-5);
+  }
+
+  .stack-proof > li {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
+/* 03 - Off-Screen: a small bento. */
+.offscreen-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+}
+
+@media (min-width: 48em) {
+  .offscreen-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+
+  .offscreen-card--photo {
+    grid-row: span 2;
+  }
+}
+
+.offscreen-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+  min-width: 0;
+  padding: var(--s-6);
+  overflow: hidden;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--r-lg);
+  background-color: var(--surface);
+}
+
+.offscreen-card--photo {
+  gap: 0;
+  padding: 0;
+}
+
+.offscreen-media {
+  position: relative;
+  align-self: stretch;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background-color: var(--bg-elevated);
+}
+
+/* Desktop bento: the photo card spans both rows and its frame takes
+   whatever height the two cards beside it add up to. */
+@media (min-width: 48em) {
+  .offscreen-media {
+    flex: 1 1 auto;
+    aspect-ratio: auto;
+    min-height: calc(var(--s-11) * 1.5);
+  }
+}
+
+.offscreen-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 74%; /* the guitarist sits low in this frame */
+  filter: var(--photo-noir);
+  transition: filter var(--dur-slow) var(--ease-out);
+}
+
+.offscreen-card--photo:hover .offscreen-media img,
+.offscreen-card--photo:focus-within .offscreen-media img {
+  filter: none;
+}
+
+.offscreen-body {
+  display: grid;
+  gap: var(--s-3);
+  justify-items: start;
+}
+
+.offscreen-card--photo .offscreen-body {
+  align-self: stretch;
+  padding: var(--s-6);
+}
+
+/* The poster device / soundwave sits on the card floor, whatever its height. */
+.offscreen-card > .offscreen-mark,
+.offscreen-card > .soundwave--still {
+  margin-block-start: auto;
+}
+
+.offscreen-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+.offscreen-card p {
+  max-width: 42ch;
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* The writing card's poster device: a huge outlined count, bottom right.
+   (Two classes so it beats `.offscreen-card p`.) */
+.offscreen-card .offscreen-mark {
+  align-self: flex-end;
+  max-width: none;
+  margin: 0;
+  font-family: var(--font-poster);
+  font-size: var(--fs-display);
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@supports (-webkit-text-stroke: 1px) {
+  .offscreen-card .offscreen-mark {
+    color: transparent;
+    -webkit-text-stroke: var(--hairline) var(--text-tertiary);
+  }
+}
+
+.soundwave--still {
+  --wave-h: var(--s-8);
+  --wave-gap: calc(var(--hairline) * 5);
+  justify-content: flex-start;
+}
+
+
+/* ---- 8. Writing (draft-blog.html) --------------------------------------- */
+
+.editorial {
+  max-width: calc(var(--editorial-w) + var(--gutter) * 2);
+}
+
+.writing-head .section-head {
+  margin-block-end: var(--s-8);
+}
+
+.writing-head .section-sub {
+  max-width: var(--measure-editorial);
+}
+
+/* The index: a numbered list of accordion rows (WAI-ARIA APG accordion). */
+.essay-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: var(--hairline) solid var(--border-strong);
+}
+
+.essay {
+  border-block-end: var(--hairline) solid var(--border);
+}
+
+.essay-heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.essay-trigger {
+  --essay-no-w: calc(var(--s-7) + var(--s-2)); /* 3.5rem number column */
+
+  display: grid;
+  grid-template-columns: var(--essay-no-w) minmax(0, 1fr) auto var(--s-5);
+  align-items: baseline;
+  column-gap: var(--s-4);
+  width: 100%;
+  min-height: var(--tap);
+  margin: 0;
+  padding: var(--s-6) 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.essay-no {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  transition: color var(--dur-base) var(--ease-spring);
+}
+
+.essay-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  text-wrap: balance;
+  transition:
+    translate var(--dur-base) var(--ease-spring),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.essay-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-tertiary);
+}
+
+/* Plus that becomes a minus. */
+.essay-icon {
+  position: relative;
+  align-self: center;
+  width: var(--s-4);
+  height: var(--s-4);
+  color: var(--text-secondary);
+  transition: color var(--dur-base) var(--ease-spring);
+}
+
+.essay-icon::before,
+.essay-icon::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  height: calc(var(--hairline) * 1.5);
+  margin-block-start: calc(var(--hairline) * -0.75);
+  border-radius: var(--r-pill);
+  background-color: currentColor;
+  transition: rotate var(--dur-base) var(--ease-spring);
+}
+
+.essay-icon::after {
+  rotate: 90deg;
+}
+
+.essay-trigger[aria-expanded="true"] .essay-icon::after {
+  rotate: 0deg;
+}
+
+.essay-trigger:hover .essay-no,
+.essay-trigger:hover .essay-icon,
+.essay-trigger[aria-expanded="true"] .essay-no,
+.essay-trigger[aria-expanded="true"] .essay-icon {
+  color: var(--gold);
+}
+
+/* Hover-capable pointers only: on a touch screen the tapped row keeps
+   :hover, and its title would stay nudged out of line with the others. */
+@media (hover: hover) {
+  .essay-trigger:hover .essay-title {
+    translate: calc(var(--hairline) * 4) 0;
+  }
+}
+
+.essay-trigger:active .essay-title {
+  opacity: 0.78;
+}
+
+.essay-trigger:focus-visible {
+  outline-offset: calc(var(--hairline) * 2);
+  border-radius: var(--r-sm);
+}
+
+@media (max-width: 39.99em) {
+  .essay-trigger {
+    --essay-no-w: var(--s-7);
+    grid-template-columns: var(--essay-no-w) minmax(0, 1fr) var(--s-4);
+    row-gap: var(--s-2);
+    column-gap: var(--s-3);
+  }
+
+  .essay-meta {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .essay-icon {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+/* Height animation: grid-template-rows 0fr -> 1fr. Panels ship OPEN in the
+   HTML (no-JS readers see everything); they collapse only while
+   html.accordion-pending is set by the inline head gate, or once
+   js/draft-writing.js marks the list .is-ready. A collapsed panel is also
+   visibility: hidden, which takes it out of the tab order and the a11y tree. */
+.essay-panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+html.accordion-pending [data-accordion] .essay-panel,
+[data-accordion].is-ready .essay-panel:not(.is-open) {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+[data-accordion].is-ready .essay-panel {
+  transition:
+    grid-template-rows var(--dur-slow) var(--ease-spring),
+    visibility 0s linear var(--dur-slow);
+}
+
+[data-accordion].is-ready .essay-panel.is-open {
+  transition-delay: 0s;
+}
+
+.essay-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* No padding on .essay-panel-inner (it would stop the 0fr collapse); the
+   space lives on .essay-body. */
+.essay-body {
+  padding: 0 0 var(--s-7) calc(var(--s-7) + var(--s-2) + var(--s-4));
+}
+
+.essay-body p {
+  max-width: var(--measure-editorial);
+  font-size: var(--fs-lg);
+  line-height: 1.7;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.essay-body p + p {
+  margin-block-start: 1.5em;
+}
+
+@media (max-width: 39.99em) {
+  .essay-body {
+    padding-inline-start: calc(var(--s-7) + var(--s-3));
+  }
+}
+
+/* POEMS, LATER. When real poems arrive, give the body this modifier and
+   author each stanza as <p class="stanza"> with raw line breaks inside.
+   pre-line keeps the author's newlines but collapses the source
+   indentation (pre-wrap would leak it). Narrower measure, full ink. */
+.essay-body--poem {
+  white-space: pre-line;
+}
+
+.essay-body--poem p,
+.essay-body--poem .stanza {
+  max-width: 46ch;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.essay-body--poem .stanza + .stanza {
+  margin-block-start: 1.6em;
+}
+
+
+/* ---- 9. Motion gating, contrast, print ----------------------------------- */
+
+/* Hover movement is motion too. (main.css's kill switch already collapses
+   every duration and delay to 1ms under both switches.) */
+@media (prefers-reduced-motion: reduce) {
+  .work-card:hover .work-card-media img,
+  .work-card:focus-within .work-card-media img {
+    scale: none;
+  }
+
+  .essay-trigger:hover .essay-title,
+  .text-link:hover svg {
+    translate: none;
+  }
+
+  .intro-stage {
+    transform: none !important;
+  }
+}
+
+:root[data-motion="reduced"] .work-card:hover .work-card-media img,
+:root[data-motion="reduced"] .work-card:focus-within .work-card-media img {
+  scale: none;
+}
+
+:root[data-motion="reduced"] .essay-trigger:hover .essay-title,
+:root[data-motion="reduced"] .text-link:hover svg {
+  translate: none;
+}
+
+:root[data-motion="reduced"] .intro-stage {
+  transform: none !important;
+}
+
+/* More contrast: no grain, stronger secondary text and borders. */
+@media (prefers-contrast: more) {
+  .draft::after {
+    display: none;
+  }
+
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    --text-secondary: color-mix(in srgb, var(--soft-white) 86%, transparent);
+    --text-tertiary:  color-mix(in srgb, var(--soft-white) 74%, transparent);
+    --border:         rgba(242, 242, 242, 0.22);
+    /* The inverse bands (home Work / About / Contact / footer) read these. */
+    --inv-text-secondary: var(--text-secondary);
+    --inv-text-tertiary:  var(--text-tertiary);
+    --inv-border:         var(--border);
+  }
+}
+
+/* Paper is light: reapply print values over the draft palette (same
+   specificity trick as section 0), and drop the atmosphere. */
+@media print {
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --bg-elevated: #ffffff;
+    --bg-sunken: #ffffff;
+    --surface: transparent;
+    --surface-hover: transparent;
+    --text: #000000;
+    --text-secondary: #333333;
+    --text-tertiary: #555555;
+    --accent: #000000;
+    --accent-text: #000000;
+    --accent-soft: transparent;
+    --border: rgba(0, 0, 0, 0.25);
+    --border-strong: rgba(0, 0, 0, 0.45);
+    --gold: #000000;
+    --cta-bg: transparent;
+    --cta-text: #000000;
+    --inv-scheme: light;
+    --inv-bg: #ffffff;
+    --inv-bg-elevated: #ffffff;
+    --inv-surface: transparent;
+    --inv-text: #000000;
+    --inv-text-secondary: #333333;
+    --inv-text-tertiary: #555555;
+    --inv-border: rgba(0, 0, 0, 0.25);
+    --inv-border-strong: rgba(0, 0, 0, 0.45);
+  }
+
+  .intro,
+  .draft::after,
+  .stage-glow::before,
+  .draft .hero::before {
+    display: none !important;
+  }
+
+  html.js-intro,
+  html.js-intro body {
+    overflow: visible !important;
+  }
+
+  html.js-intro {
+    background-color: transparent !important; /* the screen-only gutter fill */
+  }
+
+  .essay-panel {
+    grid-template-rows: 1fr !important;
+    visibility: visible !important;
+  }
+}

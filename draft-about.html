@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" data-theme="dark" data-motion="full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>About - Aidil Azani</title>
+    <meta name="description"
+        content="Computer science student at UiTM Shah Alam, frontend developer at JustSimple 2023-2024, and the person who wrote every line of this site by hand.">
+
+    <!-- Seed theme + motion before first paint so neither flashes. -->
+    <script>
+        (function () {
+            var t, m; try { t = localStorage.getItem('theme'); m = localStorage.getItem('motion'); } catch (e) { }
+            var d = document.documentElement;
+            d.className = d.className.replace(/\bno-js\b/, 'js');
+            d.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+            d.setAttribute('data-motion', m === 'reduced' ? 'reduced' : 'full');
+        })();
+    </script>
+
+    <link rel="icon" href="favicon.svg">
+    <link rel="manifest" href="site.webmanifest">
+    <!-- app.js rewrites the FIRST theme-color meta whenever the theme changes. On the drafts
+         that first one is a decoy that never matches (media="not all"), so the real value
+         below always wins and the browser chrome stays pitch black in both themes. -->
+    <meta name="theme-color" content="#050505" media="not all">
+    <meta name="theme-color" content="#050505">
+    <meta name="color-scheme" content="dark">
+    <!-- Draft page: not for search engines (GitHub Pages deploys every file in the repo). -->
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Jost:wght@400..700&family=Space+Grotesk:wght@300..700&display=swap">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/draft-theme.css">
+
+    <link rel="canonical" href="https://haidilazani.github.io/Portfolio/about.html">
+
+    <meta property="og:type" content="profile">
+    <meta property="og:site_name" content="Aidil Azani">
+    <meta property="og:url" content="https://haidilazani.github.io/Portfolio/about.html">
+    <meta property="og:title" content="About - Aidil Azani">
+    <meta property="og:description"
+        content="Computer science student at UiTM Shah Alam and a frontend developer who writes interfaces by hand.">
+    <meta property="og:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:image:alt" content="Aidil Azani">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@aidilazani">
+    <meta name="twitter:creator" content="@aidilazani">
+    <meta name="twitter:title" content="About - Aidil Azani">
+    <meta name="twitter:description"
+        content="Computer science student at UiTM Shah Alam and a frontend developer who writes interfaces by hand.">
+    <meta name="twitter:image" content="https://haidilazani.github.io/Portfolio/images/optimized/about-800.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Aidil Azani",
+      "url": "https://haidilazani.github.io/Portfolio/",
+      "inLanguage": "en",
+      "author": { "@type": "Person", "name": "Aidil Azani" }
+    }
+    </script>
+</head>
+
+<body class="draft">
+
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav" data-nav>
+        <nav class="nav-inner" aria-label="Primary">
+            <a class="nav-logo" href="draft-index.html">aidil<span>.</span></a>
+            <ul class="nav-links">
+                <li class="nav-indicator" aria-hidden="true"></li>
+                <li><a href="work.html">Work</a></li>
+                <li><a href="draft-about.html" aria-current="page">About</a></li>
+                <li><a href="draft-blog.html">Writing</a></li>
+                <li><a href="photography.html">Photography</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="cmdk-trigger" type="button" data-cmdk-open>Search <kbd>&#8984;K</kbd></button>
+                <button class="icon-btn" type="button" data-motion-toggle aria-pressed="false"
+                    aria-label="Toggle reduced motion">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M3 12h3.2l2.6-7 4.4 14 2.6-7H21" />
+                    </svg>
+                </button>
+                <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false"
+                    aria-label="Toggle colour theme">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                        stroke-width="1.6" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main">
+
+        <!-- ================================================================
+             About (draft). Three scannable chapters instead of one long
+             read: 01 The TL;DR, 02 The Stack, 03 Off-Screen. Every fact is
+             from the original about.html / photography.html; the full bio
+             is kept, folded, under the TL;DR.
+             ================================================================ -->
+        <section class="section stage-glow page-head" aria-labelledby="about-title">
+            <div class="container">
+                <div class="page-head-inner" data-reveal style="--reveal-i: 0">
+                    <p class="eyebrow">About &#183; Shah Alam, Selangor</p>
+                    <h1 class="section-title page-title" id="about-title">The longer version, <em
+                            class="accent-word">made short.</em></h1>
+                    <nav class="chapter-nav" aria-label="On this page">
+                        <ol>
+                            <li><a href="#tldr"><span class="chapter-no">01</span> The TL;DR</a></li>
+                            <li><a href="#stack"><span class="chapter-no">02</span> The Stack</a></li>
+                            <li><a href="#off-screen"><span class="chapter-no">03</span> Off-Screen</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- 01 - The TL;DR: ~50 words, capped at --measure-tldr (52ch). -->
+        <section class="section chapter" id="tldr" aria-labelledby="tldr-title">
+            <div class="container tldr-grid">
+
+                <figure class="tldr-portrait" data-reveal="fade" style="--reveal-i: 1">
+                    <picture>
+                        <source type="image/webp"
+                            srcset="images/optimized/about-400.webp 400w, images/optimized/about-800.webp 800w"
+                            sizes="(min-width: 56em) 24rem, calc(100vw - 2.5rem)">
+                        <img src="images/optimized/about-800.jpg"
+                            srcset="images/optimized/about-400.jpg 400w, images/optimized/about-800.jpg 800w"
+                            sizes="(min-width: 56em) 24rem, calc(100vw - 2.5rem)"
+                            alt="Portrait of Aidil Azani in a black suit and open-collar shirt against a deep red backdrop, lit from the left."
+                            width="800" height="800" decoding="async">
+                    </picture>
+                </figure>
+
+                <div class="tldr-body">
+                    <div class="chapter-head" data-reveal style="--reveal-i: 0">
+                        <p class="eyebrow"><span class="chapter-no">01</span> &#183; In fifty words</p>
+                        <h2 class="section-title" id="tldr-title">The <em class="accent-word">TL;DR.</em></h2>
+                    </div>
+
+                    <p class="tldr" data-reveal style="--reveal-i: 1">I&#8217;m Aidil, a <strong>computer science
+                            student at UiTM Shah Alam</strong> and a <strong>frontend developer</strong>. I spent
+                        2023&#8211;2024 building client websites at <strong>JustSimple Sdn. Bhd.</strong>, and my
+                        final-year project, <strong>GeoTour</strong>, searches UNESCO World Heritage sites by
+                        meaning. I write interfaces <strong>by hand</strong>: calm type, honest spacing, motion that
+                        earns its place.</p>
+
+                    <dl class="glance" data-reveal style="--reveal-i: 2">
+                        <div>
+                            <dt>Now</dt>
+                            <dd>Finishing my CS degree at UiTM Shah Alam and building GeoTour, my final-year project.</dd>
+                        </div>
+                        <div>
+                            <dt>2023 &#8211; 2024</dt>
+                            <dd>Frontend Developer at JustSimple Sdn. Bhd.: client sites in WordPress and Elementor,
+                                plus the custom CSS the page builder couldn&#8217;t do.</dd>
+                        </div>
+                        <div>
+                            <dt>2022 &#8211; 2023</dt>
+                            <dd>Freelance junior developer: business sites and landing pages.</dd>
+                        </div>
+                        <div>
+                            <dt>Open to</dt>
+                            <dd>Internships and freelance, in Malaysia or remote.</dd>
+                        </div>
+                    </dl>
+
+                    <details class="longer" data-reveal style="--reveal-i: 3">
+                        <summary>Read the longer version</summary>
+                        <div class="prose">
+                            <p>I&#8217;m Aidil, a computer science student at UiTM Shah Alam. I chose this path not
+                                knowing it would burn my brain and soul, yet I&#8217;m still standing here, and
+                                somewhere along the way it became mine.</p>
+                            <p>The work is less poetic. In 2022 I took small freelance jobs as a junior developer,
+                                learning the difference between classroom code and code someone is waiting on. In
+                                2023 I joined JustSimple Sdn. Bhd. as a frontend developer, building and maintaining
+                                client websites in WordPress and Elementor, and writing the custom CSS that Elementor
+                                couldn&#8217;t. Now I&#8217;m finishing my degree, with coursework across data
+                                science, machine learning and software engineering, and my final-year project is a
+                                tourism recommendation system in Flask that searches UNESCO World Heritage sites by
+                                meaning rather than keywords, using BERT sentence embeddings over an ontology of place
+                                categories.</p>
+                            <p>I care about interfaces that feel calm and intentional: clean type, honest spacing,
+                                and motion that earns its place. I like knowing what every line does, which is why
+                                this site has no framework, no bundler and no dependencies. The contour map on my
+                                home page is ~1,390 lines of marching squares and value noise on a 2D canvas. When
+                                I&#8217;m not coding I&#8217;m behind a camera, collecting the moments on my
+                                <a href="photography.html">Photography</a> page.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 02 - The Stack: the original toolbox, regrouped into four sets of
+             non-interactive pills (.skill-pills; .stack is a main.css utility). -->
+        <section class="section chapter" id="stack" aria-labelledby="stack-title">
+            <div class="container">
+
+                <div class="chapter-head" data-reveal style="--reveal-i: 0">
+                    <p class="eyebrow"><span class="chapter-no">02</span> &#183; What I reach for</p>
+                    <h2 class="section-title" id="stack-title">The <em class="accent-word">Stack.</em></h2>
+                </div>
+
+                <div class="skill-groups">
+                    <div class="skill-group" data-reveal style="--reveal-i: 1">
+                        <h3 class="skill-group-title" id="skills-languages">Languages</h3>
+                        <ul class="skill-pills" aria-labelledby="skills-languages">
+                            <li>JavaScript (ES6)</li>
+                            <li>HTML</li>
+                            <li>CSS</li>
+                            <li>Python</li>
+                            <li>SQL</li>
+                            <li>GLSL</li>
+                        </ul>
+                    </div>
+
+                    <div class="skill-group" data-reveal style="--reveal-i: 1">
+                        <h3 class="skill-group-title" id="skills-frontend">Frontend</h3>
+                        <ul class="skill-pills" aria-labelledby="skills-frontend">
+                            <li>Vanilla JS &amp; DOM</li>
+                            <li>Canvas 2D</li>
+                            <li>WebGL shaders</li>
+                            <li>Responsive CSS / custom properties</li>
+                            <li>CSS animation &amp; scroll-driven motion</li>
+                            <li>Accessibility basics (prefers-reduced-motion, ARIA labels)</li>
+                        </ul>
+                    </div>
+
+                    <div class="skill-group" data-reveal style="--reveal-i: 2">
+                        <h3 class="skill-group-title" id="skills-backend">Backend &amp; data</h3>
+                        <ul class="skill-pills" aria-labelledby="skills-backend">
+                            <li>Flask</li>
+                            <li>SQLAlchemy</li>
+                            <li>SQLite &amp; PostgreSQL</li>
+                            <li>sentence-transformers / BERT embeddings</li>
+                            <li>pandas</li>
+                            <li>NumPy</li>
+                            <li>NetworkX</li>
+                            <li>Jinja templating</li>
+                        </ul>
+                    </div>
+
+                    <div class="skill-group" data-reveal style="--reveal-i: 2">
+                        <h3 class="skill-group-title" id="skills-tools">Tools &amp; platforms</h3>
+                        <ul class="skill-pills" aria-labelledby="skills-tools">
+                            <li>Git &amp; GitHub</li>
+                            <li>GitHub Pages</li>
+                            <li>Vercel</li>
+                            <li>VS Code</li>
+                            <li>pip / virtualenv</li>
+                            <li>WordPress</li>
+                            <li>Elementor</li>
+                            <li>Figma</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <ul class="proof-bar stack-proof" data-reveal style="--reveal-i: 3">
+                    <li>
+                        <strong class="proof-value">0</strong>
+                        <span class="proof-label">npm packages, bundlers or frameworks</span>
+                    </li>
+                    <li>
+                        <strong class="proof-value">103 KB</strong>
+                        <span class="proof-label">gzipped over the wire: every page, all CSS and JS</span>
+                    </li>
+                    <li>
+                        <strong class="proof-value">1,390</strong>
+                        <span class="proof-label">lines of vanilla JS behind the contour terrain</span>
+                    </li>
+                </ul>
+
+            </div>
+        </section>
+
+        <!-- 03 - Off-Screen: photography, writing, music. Short on purpose. -->
+        <section class="section chapter" id="off-screen" aria-labelledby="offscreen-title">
+            <div class="container">
+
+                <div class="chapter-head" data-reveal style="--reveal-i: 0">
+                    <p class="eyebrow"><span class="chapter-no">03</span> &#183; Away from the editor</p>
+                    <h2 class="section-title" id="offscreen-title">Off-<em class="accent-word">Screen.</em></h2>
+                </div>
+
+                <div class="offscreen-grid">
+
+                    <article class="offscreen-card offscreen-card--photo" aria-labelledby="off-photo-title"
+                        data-reveal="fade" style="--reveal-i: 1">
+                        <div class="offscreen-media">
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="images/optimized/diki-renada-solo-400.webp 400w, images/optimized/diki-renada-solo-800.webp 800w"
+                                    sizes="(min-width: 48em) 32rem, calc(100vw - 2.5rem)">
+                                <img src="images/optimized/diki-renada-solo-800.jpg"
+                                    srcset="images/optimized/diki-renada-solo-400.jpg 400w, images/optimized/diki-renada-solo-800.jpg 800w"
+                                    sizes="(min-width: 48em) 32rem, calc(100vw - 2.5rem)"
+                                    alt="A guitarist leaning back mid-solo with a cream electric guitar raised, red stage lights burning through the smoke behind him and a bassist playing to his right."
+                                    width="800" height="1422" loading="lazy" decoding="async">
+                            </picture>
+                        </div>
+                        <div class="offscreen-body">
+                            <h3 class="offscreen-title" id="off-photo-title">Photography</h3>
+                            <p>Concerts, architecture, and the people I happened to be standing next to, 2023 to
+                                2026. Behind a camera whenever the light is right.</p>
+                            <a class="text-link" href="photography.html">See the photographs
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                                    aria-hidden="true" focusable="false">
+                                    <path d="M5 12h14M13 6l6 6-6 6" />
+                                </svg></a>
+                        </div>
+                    </article>
+
+                    <article class="offscreen-card" aria-labelledby="off-writing-title" data-reveal
+                        style="--reveal-i: 2">
+                        <h3 class="offscreen-title" id="off-writing-title">Writing</h3>
+                        <p>Six essays in the queue, from marching squares to the line on my home page. None
+                            published yet, but the index is open.</p>
+                        <a class="text-link" href="draft-blog.html">Read the index
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                                    aria-hidden="true" focusable="false">
+                                    <path d="M5 12h14M13 6l6 6-6 6" />
+                                </svg></a>
+                        <p class="offscreen-mark" aria-hidden="true">06</p>
+                    </article>
+
+                    <article class="offscreen-card" aria-labelledby="off-music-title" data-reveal
+                        style="--reveal-i: 2">
+                        <h3 class="offscreen-title" id="off-music-title">Music</h3>
+                        <p>I curate playlists on Spotify.</p>
+                        <div class="soundwave soundwave--still" aria-hidden="true">
+                                <span style="--amp:0.22;--o:0.40"></span>
+                                <span style="--amp:0.28;--o:0.46"></span>
+                                <span style="--amp:0.38;--o:0.53"></span>
+                                <span style="--amp:0.43;--o:0.61"></span>
+                                <span style="--amp:0.52;--o:0.69"></span>
+                                <span style="--amp:0.61;--o:0.77"></span>
+                                <span style="--amp:0.58;--o:0.84"></span>
+                                <span style="--amp:0.73;--o:0.90"></span>
+                                <span style="--amp:0.81;--o:0.95"></span>
+                                <span style="--amp:0.91;--o:0.98"></span>
+                                <span style="--amp:0.68;--o:1.00"></span>
+                                <span style="--amp:0.75;--o:1.00"></span>
+                                <span style="--amp:0.67;--o:0.98"></span>
+                                <span style="--amp:0.87;--o:0.95"></span>
+                                <span style="--amp:0.78;--o:0.90"></span>
+                                <span style="--amp:0.55;--o:0.84"></span>
+                                <span style="--amp:0.70;--o:0.77"></span>
+                                <span style="--amp:0.59;--o:0.69"></span>
+                                <span style="--amp:0.45;--o:0.61"></span>
+                                <span style="--amp:0.36;--o:0.53"></span>
+                                <span style="--amp:0.26;--o:0.46"></span>
+                                <span style="--amp:0.22;--o:0.40"></span>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================================================================
+             CTA (kept from the original)
+             ================================================================ -->
+        <section class="section chapter">
+            <div class="container">
+                <div class="section-head" data-reveal style="--reveal-i: 0">
+                    <h2 class="section-title">Open to internships <em class="accent-word">and freelance.</em></h2>
+                    <p class="section-sub">Malaysia or remote. I am based in Shah Alam, Selangor.</p>
+                    <p class="section-foot"><a class="btn btn-primary" href="draft-index.html#contact" data-magnetic>Get in
+                            touch</a></p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p class="footer-brand"><a href="draft-index.html">aidil<span>.</span></a></p>
+            <nav class="footer-links" aria-label="Footer">
+                <a href="work.html">Work</a>
+                <a href="draft-about.html">About</a>
+                <a href="draft-blog.html">Writing</a>
+                <a href="photography.html">Photography</a>
+                <a href="mailto:haidilazani@gmail.com">Email</a>
+            </nav>
+            <p class="footer-meta">&copy; 2026 Aidil Azani. Written by hand in HTML, CSS and JavaScript. No
+                dependencies, no build step.</p>
+        </div>
+    </footer>
+
+    <!-- Command palette -->
+    <div class="cmdk" data-cmdk hidden>
+        <div class="cmdk-panel" aria-label="Search this site">
+            <input class="cmdk-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Search pages, projects and writing" aria-label="Search pages, projects and writing">
+            <ul class="cmdk-list">
+                <li><a class="cmdk-item" href="work.html">Work</a></li>
+                <li><a class="cmdk-item" href="draft-about.html">About</a></li>
+                <li><a class="cmdk-item" href="draft-blog.html">Writing</a></li>
+                <li><a class="cmdk-item" href="photography.html">Photography</a></li>
+                <li><a class="cmdk-item" href="draft-index.html#contact">Contact</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani/FYP-1" target="_blank"
+                        rel="noopener">GeoTour source</a></li>
+                <li><a class="cmdk-item" href="https://haidilazani.github.io/Assignment/" target="_blank"
+                        rel="noopener">Buttermax study</a></li>
+                <li><a class="cmdk-item" href="https://github.com/haidilazani" target="_blank"
+                        rel="noopener">GitHub</a></li>
+                <li><a class="cmdk-item" href="mailto:haidilazani@gmail.com">Email Aidil</a></li>
+            </ul>
+            <p class="cmdk-empty" hidden>Nothing matches that.</p>
+        </div>
+    </div>
+
+    <script src="js/app.js" defer></script>
+</body>
+
+</html>

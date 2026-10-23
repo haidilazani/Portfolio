@@ -260,7 +260,7 @@
 
     const THEME_KEY = 'theme';
     const lightQuery = window.matchMedia('(prefers-color-scheme: light)');
-    const THEME_COLOR = { dark: '#060607', light: '#f5f5f7' };
+    const THEME_COLOR = { dark: '#0b0c0a', light: '#ecebe3' };
 
     function storedTheme() {
         const saved = store.get(THEME_KEY);

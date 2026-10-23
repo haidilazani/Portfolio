@@ -7,7 +7,7 @@
 
     <title>Writing - Aidil Azani</title>
     <meta name="description"
-        content="Six posts I am writing: marching squares on a 2D canvas, building a portfolio with no framework, sentence embeddings for travel search, and what client work teaches a CS student.">
+        content="Six posts I am writing: an ASCII terrain on a 2D canvas, building a portfolio with no framework, sentence embeddings for travel search, and what client work teaches a CS student.">
 
     <!-- Seed theme + motion before first paint so neither flashes. -->
     <script>
@@ -22,18 +22,19 @@
 
     <link rel="icon" href="favicon.svg">
     <link rel="manifest" href="site.webmanifest">
-    <meta name="theme-color" content="#060607" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b0c0a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ecebe3" media="(prefers-color-scheme: light)">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap">
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300..800&display=swap">
 
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/stack.css">
     <link rel="stylesheet" href="css/tilt.css">
+    <link rel="stylesheet" href="css/ascii.css">
 
     <link rel="canonical" href="https://haidilazani.github.io/Portfolio/blog.html">
 
@@ -124,11 +125,9 @@
 
                     <article class="post post--planned" data-stack-item data-tilt data-reveal style="--reveal-i: 1">
                         <p class="post-status">Planned</p>
-                        <h2 class="post-title">Drawing an interactive topographic map in vanilla JS</h2>
+                        <h2 class="post-title">Drawing an interactive ASCII terrain in vanilla JS</h2>
                         <p class="post-blurb">The background of this site is not an image and not a library. It's
-                            two value-noise fields cross-faded to make terrain breathe, traced into nine contour
-                            lines every frame with marching squares, with the cursor added as a Gaussian hill so the
-                            rings bulge around your pointer. Here's the whole algorithm, case by case, and why touch
+                            two value-noise fields cross-faded to make terrain breathe, drawn as a grid of ASCII characters picked by elevation, with every move and click added as a ripple so the characters swell around your pointer. Here's the whole algorithm, case by case, and why touch
                             devices and reduced-motion users get one static render instead.</p>
                     </article>
 

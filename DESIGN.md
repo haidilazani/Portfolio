@@ -38,6 +38,43 @@ dial, tilt, stacking and reveal systems all carry over unchanged; the
 layer changes layout, heading treatment and image placement only. Every other
 page still renders the base system.
 
+## ASCII theme (current)
+
+The site is re-skinned as ASCII. This section supersedes the palette, type and
+radius values and the topography description below, which are kept for
+history; `css/tokens.css` is the source of truth.
+
+- **Hero terrain:** `js/hero.js` still builds the same elevation field (noise
+  + basin + ripples) but renders it as characters, one per grid node, from the
+  ramp `' .:-=+*#%@'` by elevation. Glyphs are pre-tinted into an atlas and
+  blitted with `drawImage`. The resting terrain is low-alpha ink; the densest
+  glyphs only appear under a ripple and take `--accent`. The odometer dial
+  decoys are ASCII symbols.
+- **Palette:** bone `#dcdfd2` on warm black `#0b0c0a`, phosphor accent
+  `#8bf08a` (light theme: ink `#14160f` on paper `#ecebe3`, accent `#1f7a2e` /
+  text `#1a6a28`). Inverse bands flip as before.
+- **Type:** one face, JetBrains Mono. `--font-sans`, `--font-display` and
+  `--font-poster` all alias `--font-mono`, so no component rule changed. The
+  display scale was reduced to account for mono's wider advance.
+- **Shape:** every `--r-*` is `0`.
+- **Nav:** unchanged, the original floating liquid-glass island. It takes the
+  new palette and typeface through tokens; `.site-nav` restores `--r-pill` so it
+  stays a capsule while the rest of the site is square.
+- **Ornament:** `css/ascii.css` (linked last on every real page): `[ ]` around
+  buttons, `/` before nav links, `//` before kickers, `#` before tags, a block
+  caret after the hero keyword, and a faint scanline.
+- **Entrance, home page only:** `css/loader.css` + `js/loader.js`, gated by an
+  inline script in `index.html`'s `<head>` (`html.ld`). A full-screen field of
+  slowly drifting ASCII terrain (the hero's own landscape) on a canvas; a
+  waterline drops as progress rises so the land fills in. DOM HUD: `%` counter,
+  boot log, `[=====>   ]` bar, skip button. No name, no rotation, nothing pulled
+  toward a point. Progress is held at 92% until the font and `load` are really
+  in. The finale is a ragged ring of glyphs that clears the field from the
+  centre outward; the page is released partway through (`ld-leaving`,
+  `ld:leave`) so the hero's terrain sweep and dial play into the hole
+  (`hero.js` waits on `ld:leave`). Skip: Esc / Enter / Space / click. Not shown
+  for reduced motion, `#hash`, back/forward or `?intro=0`.
+
 ## Tokens
 
 ### Colour — dark (`:root`, default)

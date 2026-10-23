@@ -1,0 +1,190 @@
+/* ==========================================================================
+   loader.css - the home page entrance ("the descent")
+   --------------------------------------------------------------------------
+   A full-screen overlay: an ASCII tunnel painted on a canvas (js/loader.js)
+   with a DOM HUD on top of it. The HUD is plain text so it is crisp, themed
+   by the same tokens as the page, and readable by assistive tech; the canvas
+   is decoration only.
+
+   STATE (classes on <html>)
+     ld          set by the inline gate in <head>: overlay up, page locked.
+                 Absent in reduced motion, on #hash deep links, on
+                 back/forward and with ?intro=0, so the overlay is never
+                 rendered for them.
+     ld-ready    set by loader.js the moment it runs: "I own the overlay".
+                 If it is missing at DOMContentLoaded the gate lets go.
+     ld-leaving  the shockwave has opened a hole; the page is released and
+                 the hero entrance plays now (hero.js listens for ld:leave).
+   Without .ld the overlay is display: none: no script, no overlay, no trap.
+
+   Tokens only. The one literal size is the HUD's own type, which follows
+   the canvas cell size through --ld-fs so the bar lines up with the grid.
+   ========================================================================== */
+
+.ld-ov { display: none; }
+
+html.ld:not(.ld-leaving) { overflow: hidden; }
+
+html.ld .ld-ov {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  cursor: progress;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The canvas paints its own background, so once the hole opens the overlay
+   itself must stop covering the page. */
+html.ld-leaving .ld-ov {
+  background: transparent;
+  pointer-events: none;
+  cursor: auto;
+}
+
+.ld-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- HUD ---------------------------------------------------------------- */
+
+.ld-hud {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "tl  tr"
+    "mid mid"
+    "bl  br"
+    "bar bar";
+  padding: clamp(1rem, 2.4vw, 2rem);
+  pointer-events: none;
+}
+
+.ld-id { grid-area: tl; align-self: start; text-transform: uppercase; }
+.ld-id { opacity: 0.7; }
+
+.ld-tr {
+  grid-area: tr;
+  justify-self: end;
+  align-self: start;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.ld-skip {
+  pointer-events: auto;
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0 0 var(--s-2);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  color: var(--text);
+  cursor: pointer;
+}
+.ld-skip::before { content: "[ "; opacity: 0.55; }
+.ld-skip::after  { content: " ]"; opacity: 0.55; }
+.ld-skip:hover,
+.ld-skip:focus-visible { color: var(--accent-text); }
+.ld-skip:focus-visible { outline: 1px dashed var(--accent); outline-offset: 4px; }
+
+.ld-count {
+  grid-area: bl;
+  align-self: end;
+  display: flex;
+  align-items: flex-start;
+  font-size: clamp(4.5rem, 16vw, 13rem);
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+.ld-count s { text-decoration: none; opacity: 0.22; }
+.ld-count i {
+  font-style: normal;
+  font-size: 0.26em;
+  line-height: 1;
+  letter-spacing: 0;
+  margin-left: 0.18em;
+  color: var(--accent-text);
+}
+
+.ld-log {
+  grid-area: br;
+  align-self: end;
+  justify-self: end;
+  width: min(25rem, 100%);
+  min-height: calc(6 * 1.75em);          /* reserved up front so the tunnel is veiled behind it from frame one */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.75;
+}
+.ld-log li { display: flex; gap: 1ch; white-space: nowrap; }
+.ld-log .ld-k { flex: none; width: 6ch; color: var(--accent-text); text-transform: uppercase; }
+.ld-log .ld-d { flex: 1; overflow: hidden; opacity: 0.35; }
+.ld-log .ld-v { flex: none; min-width: 7ch; text-align: right; opacity: 0.55; }
+.ld-log .ld-v.is-ok { color: var(--accent-text); opacity: 1; }
+
+.ld-bar {
+  grid-area: bar;
+  min-width: 0;
+  margin-top: var(--s-3);
+  font-size: var(--ld-fs, 12px);
+  line-height: 1;
+  white-space: pre;
+  overflow: hidden;
+  letter-spacing: 0;
+}
+.ld-bar b { font-weight: 800; color: var(--accent-text); }
+.ld-bar span { opacity: 0.3; }
+
+@media (max-width: 640px) {
+  .ld-hud {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    grid-template-areas: "tl" "mid" "br" "bl" "bar";
+  }
+  .ld-tr { grid-area: tl; grid-row: 1; }
+  .ld-log { justify-self: stretch; width: auto; margin-bottom: var(--s-4); font-size: 0.6875rem; }
+}
+
+/* ---- Breach ------------------------------------------------------------- */
+
+.ld-id, .ld-tr, .ld-count, .ld-log, .ld-bar { transition: opacity 380ms var(--ease-out); }
+
+.ld-ov.is-breach .ld-id,
+.ld-ov.is-breach .ld-tr,
+.ld-ov.is-breach .ld-log,
+.ld-ov.is-breach .ld-bar,
+.ld-ov.is-breach .ld-count { opacity: 0; }
+
+/* ---- Hold the page's own entrance until the hole opens ------------------- */
+
+html.ld:not(.ld-leaving) .hero *,
+html.ld:not(.ld-leaving) .hero *::before,
+html.ld:not(.ld-leaving) .hero *::after {
+  animation-play-state: paused !important;
+}
+
+@media print {
+  html.ld .ld-ov { display: none; }
+}

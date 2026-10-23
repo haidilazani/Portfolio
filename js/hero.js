@@ -1,9 +1,12 @@
 /* ==========================================================================
    hero.js - the hero section's interactive pieces.
 
-   PIECE 1: the topographic terrain (canvas)
-   A scalar elevation field is sampled on a grid and drawn as contour lines
-   with marching squares. The field is the sum of three contributions:
+   PIECE 1: the ASCII terrain (canvas)
+   A scalar elevation field is sampled on a character grid and drawn as ASCII:
+   one glyph per node, chosen from a density ramp (' .:-=+*#%@') by elevation.
+   (It used to be traced as contour lines with marching squares; the field and
+   all the interaction below are unchanged.) The field is the sum of three
+   contributions:
 
        field = breathing_noise + text_basin + disturbances
 
@@ -79,6 +82,18 @@
         mqReduce.addListener(fireMotionChange);
     }
 
+    /* LOADER HAND-OFF (js/loader.js, home page only)
+       While the entrance overlay is up (html.ld without html.ld-leaving) the
+       dial and the terrain entrance wait, so they play on screen as the
+       overlay tears open rather than unseen underneath it. The loader fires
+       `ld:leave` at that moment. Without a loader none of this is ever true. */
+    const ldRoot = document.documentElement;
+    let ldReleasedAt = 0;
+    function ldHeld() {
+        return ldRoot.classList.contains('ld') && !ldRoot.classList.contains('ld-leaving');
+    }
+    window.addEventListener('ld:leave', function () { ldReleasedAt = performance.now(); });
+
     /* data-theme and data-motion both live on <html>; one observer covers
        both and dispatches to whichever piece cares. */
     const themeListeners = [];
@@ -131,17 +146,12 @@
            scrambling it now would be worse than not animating at all. */
         const LATE_BOOT_MS = 1200;
 
-        const LOWER = 'abcdefghijklmnopqrstuvwxyz';
-        const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const DIGIT = '0123456789';
+        /* The decoys are ASCII line noise, not letters: the keyword resolves
+           out of the same symbol set the terrain is drawn with. */
+        const NOISE = '@#%&*+=-:;/\\|<>[]{}0123456789';
 
-        /* Cycle within the final glyph's own family so the roll reads like an
-           odometer wheel rather than random noise falling past a window. */
-        function poolFor(ch) {
-            if (ch >= 'a' && ch <= 'z') return LOWER;
-            if (ch >= 'A' && ch <= 'Z') return UPPER;
-            if (ch >= '0' && ch <= '9') return DIGIT;
-            return LOWER;
+        function poolFor() {
+            return NOISE;
         }
 
         function rolls(ch) {
@@ -294,13 +304,15 @@
                "full" while the heading is still fresh gets the roll. */
             if (resolveReduced()) { collapse(); return; }
             if (done || built) return;
+            if (ldHeld()) return;           // the loader calls apply() again on release
             /* Never roll a heading that has been on screen long enough to
                have been read: a late-executing script must not scramble it. */
-            if (performance.now() > LATE_BOOT_MS) { done = true; return; }
+            if (performance.now() - ldReleasedAt > LATE_BOOT_MS) { done = true; return; }
             build();
         }
 
         onMotionChange(apply);
+        window.addEventListener('ld:leave', apply);
         apply();
     })();
 
@@ -311,27 +323,29 @@
 
     (function initTerrain() {
 
-        /* Pages without a hero must no-op silently rather than throw. Path2D
-           is the one API we cannot polyfill cheaply, so bail out if it is
-           missing (the hero still reads fine, and the dial above already ran). */
+        /* Pages without a hero must no-op silently rather than throw. */
         const hero = document.querySelector('[data-hero]');
         if (!hero) return;
         const canvas = hero.querySelector('[data-hero-canvas]');
         if (!canvas || typeof canvas.getContext !== 'function') return;
-        if (typeof Path2D !== 'function') return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         const innerEl = hero.querySelector('.hero-inner');
 
         /* ---- 1. Tuning ---------------------------------------------------
-           Field values live roughly in -0.16..1.15. Contour level L
-           (0-indexed) sits at (L + 1) * LEVEL_SPREAD / (levels + 1), so the
-           top one or two levels are normally *above* the terrain and only
-           appear where a disturbance pushes elevation up. That is deliberate:
-           the highest rings are reserved for the ripple, and they are the
-           ones stroked in --accent. */
+           Field values live roughly in -0.16..1.15. The field is rendered as
+           ASCII: each grid node is one character, picked from RAMP by
+           elevation (a node's glyph index is floor(v / RAMP_STEP)). The top
+           two or three glyphs are normally *above* the resting terrain and
+           only appear where a disturbance pushes elevation up. That is
+           deliberate: the densest characters are reserved for the ripple,
+           and they are the ones drawn in --accent. */
+        const RAMP          = ' .:-=+*#%@';
+        const RAMP_N        = RAMP.length;
+        const RAMP_STEP     = 0.105;    // elevation per glyph step
+        const RAMP_FLOOR    = 0.2;      // elevation below which a node stays blank
+        const ACCENT_FROM   = 7;        // first glyph index tinted towards --accent
         const NOISE_SCALE   = 0.0024;   // terrain feature size (smaller = wider hills)
-        const LEVEL_SPREAD  = 1.08;     // elevation range the contour levels span
         const BREATHE_SPEED = 0.00009;  // rad/ms: one full breath is ~70s
         const BREATH_EPS    = 0.0022;   // below this per-tick delta, skip the redraw
 
@@ -366,7 +380,7 @@
 
         /* ---- 2. State ----------------------------------------------------- */
         let dpr = 1, width = 0, height = 0;
-        let cell = 18, levels = 9, cols = 0, rows = 0, stride = 0;
+        let cellW = 10, cellH = 18, fontPx = 16, cols = 0, rows = 0, stride = 0;
         let sized = false;
 
         let noiseA = null;  // two independent noise fields ...
@@ -399,16 +413,20 @@
         let dropNext = 0, clickNext = 0, liveRipples = 0;
         let dropX = 0, dropY = 0;
 
-        const levelAlpha = new Float32Array(16);
+        const glyphAlpha = new Float32Array(RAMP_N);   // entrance fade, per glyph index
         let entranceDone = false;
         let entranceStart = 0;
 
-        const paths = [];                        // one Path2D per level
-        const levelStroke = new Array(16);       // rgba() strings, rebuilt on theme change
-        const levelWidth = new Float32Array(16);
+        /* Glyph atlas: one pre-tinted character per ramp index, laid out in a
+           strip. Drawing a node is then a drawImage of a tiny sprite instead of
+           a fillText, which is what keeps ~8k characters per frame cheap. */
+        const atlas = document.createElement('canvas');
+        const actx = atlas.getContext('2d');
+        let atlasW = 0;                          // device px per glyph
 
         let colAccent = [41, 151, 255, 1];
-        let colBorder = [255, 255, 255, 0.10];
+        let colInk = [245, 245, 247, 1];
+        let fontFamily = 'ui-monospace, Menlo, monospace';
 
         let raf = 0, timer = 0, resizeTimer = 0;
         let mode = 'off';
@@ -452,30 +470,38 @@
         function readColors() {
             const cs = getComputedStyle(document.documentElement);
             colAccent = parseColor(cs.getPropertyValue('--accent'), [41, 151, 255, 1]);
-            colBorder = parseColor(cs.getPropertyValue('--border'), [255, 255, 255, 0.10]);
-            buildLevelStyles();
+            colInk = parseColor(cs.getPropertyValue('--text'), [245, 245, 247, 1]);
+            const f = cs.getPropertyValue('--font-mono').trim();
+            if (f) fontFamily = f;
+            buildAtlas();
         }
 
-        /* Colour is chosen per LEVEL, not per cell. The bottom levels are the
-           resting terrain and take --border; the top two ramp to --accent and
-           get a slightly heavier line. Because those top levels only exist
-           where something has pushed the elevation up, a click blooms an
-           accent-coloured ring out of a neutral field for free: no distance
-           test, no sqrt, no extra Path2D. That is what replaced the old
-           per-cell focus pool around the cursor. */
-        function buildLevelStyles() {
-            const base = Math.min(0.30, Math.max(0.12, (colBorder[3] || 0.1) * 2.0));
-            const peak = 0.60;
-            for (let l = 0; l < levels; l++) {
-                /* Ramp across the top three levels: 0 at levels-3, 1 at levels-1. */
-                let t = (l - (levels - 3)) / 2;
+        /* Colour is chosen per GLYPH, not per node. The low glyphs are the
+           resting terrain: ink at low alpha. The top ones ramp to --accent and
+           grow opaque. Because those glyphs only exist where something has
+           pushed the elevation up, a click blooms an accent-coloured ring of
+           dense characters out of a quiet field for free: no distance test, no
+           sqrt. The atlas is rebuilt on theme, font and size changes. */
+        function buildAtlas() {
+            if (!cellW) return;
+            atlasW = Math.round(cellW * dpr);
+            const ah = Math.round(cellH * dpr);
+            atlas.width = atlasW * RAMP_N;
+            atlas.height = ah;
+            actx.clearRect(0, 0, atlas.width, atlas.height);
+            actx.textAlign = 'center';
+            actx.textBaseline = 'middle';
+            actx.font = '500 ' + (fontPx * dpr) + 'px ' + fontFamily;
+            for (let k = 1; k < RAMP_N; k++) {
+                let t = (k - ACCENT_FROM) / (RAMP_N - 1 - ACCENT_FROM);
                 if (t < 0) t = 0; else if (t > 1) t = 1;
-                const r = Math.round(colBorder[0] + (colAccent[0] - colBorder[0]) * t);
-                const g = Math.round(colBorder[1] + (colAccent[1] - colBorder[1]) * t);
-                const b = Math.round(colBorder[2] + (colAccent[2] - colBorder[2]) * t);
-                const a = base + (peak - base) * t;
-                levelStroke[l] = 'rgba(' + r + ',' + g + ',' + b + ',' + a.toFixed(3) + ')';
-                levelWidth[l] = 1 + 0.35 * t;
+                const r = Math.round(colInk[0] + (colAccent[0] - colInk[0]) * t);
+                const g = Math.round(colInk[1] + (colAccent[1] - colInk[1]) * t);
+                const b = Math.round(colInk[2] + (colAccent[2] - colInk[2]) * t);
+                const base = 0.10 + 0.18 * (k / ACCENT_FROM);    // resting terrain stays quiet
+                const a = base + (0.95 - base) * t;
+                actx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a.toFixed(3) + ')';
+                actx.fillText(RAMP.charAt(k), k * atlasW + atlasW / 2, ah / 2 + dpr);
             }
         }
 
@@ -506,11 +532,11 @@
            hairline costs 2x the device pixels. */
         function pickResolution(w, h) {
             const minSide = Math.min(w, h);
-            let c = Math.sqrt(w * h) / 63;
-            c *= 1 + (Math.min(dpr, 2) - 1) * 0.15;
-            if (minSide < 620) c *= 1.2;
-            cell = Math.max(15, Math.min(30, Math.round(c)));
-            levels = Math.max(5, Math.min(9, Math.round(minSide / 100)));
+            let f = Math.sqrt(w * h) / 72;
+            if (minSide < 620) f *= 1.1;
+            fontPx = Math.max(12, Math.min(20, Math.round(f)));
+            cellW = Math.round(fontPx * 0.62);
+            cellH = Math.round(fontPx * 1.15);
         }
 
         function buildFields() {
@@ -524,9 +550,9 @@
             const fnB = makeNoise(91);
             let i = 0;
             for (let r = 0; r <= rows; r++) {
-                const ny = r * cell * NOISE_SCALE;
+                const ny = r * cellH * NOISE_SCALE;
                 for (let c = 0; c <= cols; c++, i++) {
-                    const nx = c * cell * NOISE_SCALE;
+                    const nx = c * cellW * NOISE_SCALE;
                     noiseA[i] = fnA(nx, ny);
                     noiseB[i] = fnB(nx, ny);
                 }
@@ -590,27 +616,22 @@
             const cy = ir.top - rect.top + ir.height / 2;
             const hx = ir.width / 2 + BASIN_PAD_X;
             const hy = ir.height / 2 + BASIN_PAD_Y;
-            const c0 = Math.max(0, Math.floor((cx - hx - BASIN_FALLOFF) / cell));
-            const c1 = Math.min(cols, Math.ceil((cx + hx + BASIN_FALLOFF) / cell));
-            const r0 = Math.max(0, Math.floor((cy - hy - BASIN_FALLOFF) / cell));
-            const r1 = Math.min(rows, Math.ceil((cy + hy + BASIN_FALLOFF) / cell));
+            const c0 = Math.max(0, Math.floor((cx - hx - BASIN_FALLOFF) / cellW));
+            const c1 = Math.min(cols, Math.ceil((cx + hx + BASIN_FALLOFF) / cellW));
+            const r0 = Math.max(0, Math.floor((cy - hy - BASIN_FALLOFF) / cellH));
+            const r1 = Math.min(rows, Math.ceil((cy + hy + BASIN_FALLOFF) / cellH));
             for (let r = r0; r <= r1; r++) {
-                const dy = Math.max(Math.abs(r * cell - cy) - hy, 0);
+                const dy = Math.max(Math.abs(r * cellH - cy) - hy, 0);
                 const dy2 = dy * dy;
                 let i = r * stride + c0;
                 for (let c = c0; c <= c1; c++, i++) {
-                    const dx = Math.max(Math.abs(c * cell - cx) - hx, 0);
+                    const dx = Math.max(Math.abs(c * cellW - cx) - hx, 0);
                     const d = Math.sqrt(dx * dx + dy2);
                     if (d >= BASIN_FALLOFF) continue;
                     const t = 1 - d / BASIN_FALLOFF;
                     basin[i] = BASIN_AMP * t * t * (3 - 2 * t);
                 }
             }
-        }
-
-        function resetPaths() {
-            paths.length = levels;
-            for (let i = 0; i < paths.length; i++) paths[i] = null;
         }
 
         function measureRect() {
@@ -642,20 +663,19 @@
             canvas.width = Math.round(w * dpr);
             canvas.height = Math.round(h * dpr);
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            cols = Math.ceil(w / cell);
-            rows = Math.ceil(h / cell);
+            cols = Math.ceil(w / cellW);
+            rows = Math.ceil(h / cellH);
             stride = cols + 1;
             buildFields();
             computeBasin();
-            resetPaths();
-            buildLevelStyles();     // `levels` may have changed
+            buildAtlas();           // glyph size may have changed
             sized = true;
             statDirty = true;
             lastBreath = -1;
             if (!entranceDone && !reduced) {
-                for (let l = 0; l < levels; l++) levelAlpha[l] = 0;
+                glyphAlpha.fill(0);
             } else {
-                for (let l = 0; l < levels; l++) levelAlpha[l] = 1;
+                glyphAlpha.fill(1);
             }
             forceDraw();
             sync();
@@ -697,11 +717,11 @@
            shallow troughs either side, which is what reads as "a wave" rather
            than "a growing blob". */
         function ringRow(r, xFrom, xTo, px, dy2, radius, invW, amp) {
-            let c = Math.max(0, Math.floor(xFrom / cell));
-            const cEnd = Math.min(cols, Math.ceil(xTo / cell));
+            let c = Math.max(0, Math.floor(xFrom / cellW));
+            const cEnd = Math.min(cols, Math.ceil(xTo / cellW));
             let i = r * stride + c;
             for (; c <= cEnd; c++, i++) {
-                const dx = c * cell - px;
+                const dx = c * cellW - px;
                 const u = (Math.sqrt(dx * dx + dy2) - radius) * invW;
                 if (u < -2.5 || u > 2.5) continue;
                 field[i] += amp * Math.exp(-u * u * 0.9) * Math.cos(u * 1.9);
@@ -717,14 +737,14 @@
             const inner = radius - reach;
             const outer2 = outer * outer;
             const inner2 = inner > 0 ? inner * inner : -1;
-            const c0 = Math.max(0, Math.floor((px - outer) / cell));
-            const c1 = Math.min(cols, Math.ceil((px + outer) / cell));
-            const r0 = Math.max(0, Math.floor((py - outer) / cell));
-            const r1 = Math.min(rows, Math.ceil((py + outer) / cell));
+            const c0 = Math.max(0, Math.floor((px - outer) / cellW));
+            const c1 = Math.min(cols, Math.ceil((px + outer) / cellW));
+            const r0 = Math.max(0, Math.floor((py - outer) / cellH));
+            const r1 = Math.min(rows, Math.ceil((py + outer) / cellH));
             if (c1 < c0 || r1 < r0) return;
             const invW = 1 / w;
             for (let r = r0; r <= r1; r++) {
-                const dy = r * cell - py;
+                const dy = r * cellH - py;
                 const dy2 = dy * dy;
                 if (dy2 >= outer2) continue;
                 const spanOut = Math.sqrt(outer2 - dy2);
@@ -767,122 +787,31 @@
             pC0 = dC0; pR0 = dR0; pC1 = dC1; pR1 = dR1;
         }
 
-        /* ---- 7. Contouring ------------------------------------------------- */
+        /* ---- 7. Rendering --------------------------------------------------- */
 
-        /* Where along an edge the contour crosses, linearly interpolated. */
-        function edgeT(v0, v1, level) {
-            const d = v1 - v0;
-            return d === 0 ? 0.5 : (level - v0) / d;
-        }
-
-        function drawContours() {
+        /* One character per grid node, centred on the node. Blank nodes (the
+           bottom of the ramp, and the cleared basin behind the headline) cost
+           nothing. */
+        function drawAscii() {
             ctx.clearRect(0, 0, width, height);
 
-            const step = LEVEL_SPREAD / (levels + 1);
-            const invStep = 1 / step;
-            const hiCut = levels * step;
+            const invStep = 1 / RAMP_STEP;
+            const top = RAMP_N - 1;
+            const hw = cellW / 2, hh = cellH / 2;
+            let curAlpha = -1;
 
-            for (let k = 0; k < levels; k++) paths[k] = null;
-
-            /* Cell-major scan. The old code ran the whole grid once per level;
-               here each cell is visited once and only the levels that can possibly
-               cross it are tested. Nothing inside this loop allocates, and with
-               the focus pool gone there is no longer a sqrt per emitting cell. */
-            for (let r = 0; r < rows; r++) {
-                const y0 = r * cell;
-                const y1 = y0 + cell;
-                const rowBase = r * stride;
-                for (let c = 0; c < cols; c++) {
-                    const i0 = rowBase + c;
-                    const tl = field[i0];
-                    const tr = field[i0 + 1];
-                    const bl = field[i0 + stride];
-                    const br = field[i0 + stride + 1];
-
-                    let lo = tl, hi = tl;
-                    if (tr < lo) lo = tr; else if (tr > hi) hi = tr;
-                    if (br < lo) lo = br; else if (br > hi) hi = br;
-                    if (bl < lo) lo = bl; else if (bl > hi) hi = bl;
-                    if (hi < step || lo >= hiCut) continue;   // flat / out of range
-
-                    let lStart = Math.floor(lo * invStep) - 1;
-                    if (lStart < 0) lStart = 0;
-                    let lEnd = Math.ceil(hi * invStep);
-                    if (lEnd > levels - 1) lEnd = levels - 1;
-                    if (lEnd < lStart) continue;
-
-                    const x0 = c * cell;
-                    const x1 = x0 + cell;
-
-                    for (let l = lStart; l <= lEnd; l++) {
-                        const level = (l + 1) * step;
-
-                        /* Marching-squares case: one bit per corner,
-                           tl=8 tr=4 br=2 bl=1. */
-                        let id = 0;
-                        if (tl > level) id |= 8;
-                        if (tr > level) id |= 4;
-                        if (br > level) id |= 2;
-                        if (bl > level) id |= 1;
-                        if (id === 0 || id === 15) continue;
-
-                        let p = paths[l];
-                        if (p === null) { p = new Path2D(); paths[l] = p; }
-
-                        switch (id) {
-                            case 1: case 14:
-                                p.moveTo(x0, y0 + edgeT(tl, bl, level) * cell);
-                                p.lineTo(x0 + edgeT(bl, br, level) * cell, y1);
-                                break;
-                            case 2: case 13:
-                                p.moveTo(x0 + edgeT(bl, br, level) * cell, y1);
-                                p.lineTo(x1, y0 + edgeT(tr, br, level) * cell);
-                                break;
-                            case 3: case 12:
-                                p.moveTo(x0, y0 + edgeT(tl, bl, level) * cell);
-                                p.lineTo(x1, y0 + edgeT(tr, br, level) * cell);
-                                break;
-                            case 4: case 11:
-                                p.moveTo(x0 + edgeT(tl, tr, level) * cell, y0);
-                                p.lineTo(x1, y0 + edgeT(tr, br, level) * cell);
-                                break;
-                            case 5:   // saddle
-                                p.moveTo(x0, y0 + edgeT(tl, bl, level) * cell);
-                                p.lineTo(x0 + edgeT(tl, tr, level) * cell, y0);
-                                p.moveTo(x0 + edgeT(bl, br, level) * cell, y1);
-                                p.lineTo(x1, y0 + edgeT(tr, br, level) * cell);
-                                break;
-                            case 6: case 9:
-                                p.moveTo(x0 + edgeT(tl, tr, level) * cell, y0);
-                                p.lineTo(x0 + edgeT(bl, br, level) * cell, y1);
-                                break;
-                            case 7: case 8:
-                                p.moveTo(x0, y0 + edgeT(tl, bl, level) * cell);
-                                p.lineTo(x0 + edgeT(tl, tr, level) * cell, y0);
-                                break;
-                            case 10:  // saddle
-                                p.moveTo(x0 + edgeT(tl, tr, level) * cell, y0);
-                                p.lineTo(x1, y0 + edgeT(tr, br, level) * cell);
-                                p.moveTo(x0, y0 + edgeT(tl, bl, level) * cell);
-                                p.lineTo(x0 + edgeT(bl, br, level) * cell, y1);
-                                break;
-                        }
-                    }
+            for (let r = 0; r <= rows; r++) {
+                const y = r * cellH - hh;
+                let i = r * stride;
+                for (let c = 0; c <= cols; c++, i++) {
+                    let k = ((field[i] - RAMP_FLOOR) * invStep) | 0;
+                    if (k <= 0) continue;
+                    if (k > top) k = top;
+                    const ga = glyphAlpha[k];
+                    if (ga <= 0.002) continue;
+                    if (ga !== curAlpha) { ctx.globalAlpha = ga; curAlpha = ga; }
+                    ctx.drawImage(atlas, k * atlasW, 0, atlasW, atlas.height, c * cellW - hw, y, cellW, cellH);
                 }
-            }
-
-            /* One stroke per non-empty level: at most 9, typically 6 or 7.
-               globalAlpha carries the entrance fade so no per-frame colour
-               strings are built. */
-            for (let l = 0; l < levels; l++) {
-                const la = levelAlpha[l];
-                if (la <= 0.002) continue;
-                const p = paths[l];
-                if (p === null) continue;
-                ctx.globalAlpha = la;
-                ctx.strokeStyle = levelStroke[l];
-                ctx.lineWidth = levelWidth[l];
-                ctx.stroke(p);
             }
             ctx.globalAlpha = 1;
 
@@ -895,17 +824,17 @@
         /* ---- 8. Simulation step -------------------------------------------- */
 
         function updateEntrance(now) {
-            if (entranceDone) return;
+            if (entranceDone || ldHeld()) return;
             let p = (now - entranceStart) / ENTRANCE_MS;
             if (p >= 1) {
                 p = 1;
                 entranceDone = true;
             }
             const e = 1 - Math.pow(1 - p, 3);
-            const front = e * (levels + 1.6);   // sweeps from the lowest contour up
-            for (let l = 0; l < levels; l++) {
+            const front = e * (RAMP_N + 1.6);   // sweeps from the sparsest glyph up
+            for (let l = 0; l < RAMP_N; l++) {
                 const a = front - l;
-                levelAlpha[l] = a <= 0 ? 0 : (a >= 1 ? 1 : a);
+                glyphAlpha[l] = a <= 0 ? 0 : (a >= 1 ? 1 : a);
             }
         }
 
@@ -926,20 +855,20 @@
             }
 
             applyDynamic(now);
-            drawContours();
+            drawAscii();
         }
 
         /* Render exactly one frame with no interaction and the breath frozen
            mid-cycle. This is the whole of reduced-motion mode. */
         function renderStatic() {
             if (!sized) return;
-            for (let l = 0; l < levels; l++) levelAlpha[l] = 1;
+            glyphAlpha.fill(1);
             composeStat(Math.PI / 2);
             dC0 = cols + 1; dR0 = rows + 1; dC1 = -1; dR1 = -1;
             pC0 = 0; pR0 = 0; pC1 = -1; pR1 = -1;
             statDirty = false;
             lastBreath = 0.5;
-            drawContours();
+            drawAscii();
         }
 
         /* ---- 9. Driver: off / ambient / live -------------------------------- */
@@ -1155,6 +1084,11 @@
         }
 
         onThemeChange(function () { readColors(); forceDraw(); });
+
+        /* The atlas is drawn with the web font; rebuild it once that arrives. */
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function () { buildAtlas(); forceDraw(); });
+        }
         onMotionChange(function () { applyMotionMode(false); });
 
         document.addEventListener('visibilitychange', function () {
@@ -1212,8 +1146,7 @@
                     p95: +arr[(n * 0.95) | 0].toFixed(3),
                     max: +arr[n - 1].toFixed(3),
                     grid: cols + 'x' + rows,
-                    cell: cell,
-                    levels: levels,
+                    cell: cellW + 'x' + cellH,
                     dpr: dpr,
                     mode: mode,
                     ripples: liveRipples
@@ -1223,6 +1156,11 @@
         }
 
         /* ---- 14. Boot --------------------------------------------------------- */
+
+        window.addEventListener('ld:leave', function () {
+            entranceStart = performance.now();
+            sync();
+        });
 
         readColors();
         entranceStart = performance.now();

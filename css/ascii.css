@@ -1,0 +1,114 @@
+/* ==========================================================================
+   ascii.css - the ASCII theme's decoration layer
+   --------------------------------------------------------------------------
+   The theme itself lives in tokens.css: one monospace face, square corners,
+   a bone-on-black palette with a phosphor accent. This file adds only what a
+   token cannot: characters used as ornament (brackets, prefixes, rules), a
+   faint scanline and a blinking caret. It is linked last on every page and
+   uses tokens only; no colour or size is declared here that is not already
+   in tokens.css.
+
+   Everything here is ornament. Generated content is aria-hidden by being
+   `content` strings, and nothing carries meaning that the markup does not.
+   ========================================================================== */
+
+/* ---- 1. Base ------------------------------------------------------------ */
+
+html { font-variant-ligatures: none; }
+
+body {
+  font-feature-settings: "calt" 0, "liga" 0;
+  letter-spacing: 0;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* Scanlines: a 3px raster over the whole page. Under the nav and overlays,
+   never over them, and never intercepting a pointer. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sticky);
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    color-mix(in srgb, var(--text) 4%, transparent) 2px,
+    color-mix(in srgb, var(--text) 4%, transparent) 3px
+  );
+}
+
+/* ---- 2. Square, boxed surfaces ----------------------------------------- */
+
+/* Radii are 0 by token. Round buttons were hard-coded to 50%; a character
+   grid has no circles, so they become boxes. */
+.round-btn,
+.round-btn:focus-visible { border-radius: 0; }
+
+/* ---- 3. Brackets and prefixes ------------------------------------------ */
+
+.btn { padding-inline: var(--s-4); }
+.btn::before { content: "["; margin-right: var(--s-1); opacity: 0.55; }
+.btn::after  { content: "]"; margin-left: var(--s-1);  opacity: 0.55; }
+
+
+.kicker::before,
+.eyebrow::before { content: "// "; opacity: 0.6; }
+.kicker > span:first-child::before { content: none; }
+
+.hero-eyebrow::before { content: "> "; color: var(--accent-text); }
+
+.tag::before { content: "#"; opacity: 0.55; }
+
+.hero-hint kbd,
+kbd {
+  border-radius: 0;
+}
+
+/* ---- 4. Hero ------------------------------------------------------------ */
+
+/* A blinking block caret after the keyword, so the headline reads as typed
+   at a prompt. Static when motion is reduced. */
+.hero-title .accent-word::after {
+  content: "\2588";
+  display: inline-block;
+  margin-left: 0.1em;
+  font-size: 0.62em;
+  line-height: 1;
+  vertical-align: baseline;
+  color: var(--accent-text);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html[data-motion="full"] .hero-title .accent-word::after {
+  animation: ascii-caret 1.05s steps(1, end) infinite;
+}
+
+@keyframes ascii-caret {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+
+/* ---- 5. Rules ----------------------------------------------------------- */
+
+/* Dashed hairlines read as a row of hyphens. */
+hr {
+  border-style: dashed;
+}
+
+/* ---- 6. Navigation ------------------------------------------------------- */
+
+/* The nav keeps its original floating liquid-glass island (main.css 08). The
+   theme squares every radius by token, and the island is the one surface that
+   stays a capsule, so the pill radius is put back for it alone. */
+.site-nav { --r-pill: 999px; }
+
+@media print {
+  body::after { content: none; }
+}

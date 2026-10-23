@@ -16,37 +16,37 @@
   color-scheme: dark;
 
   /* Surfaces -------------------------------------------------------------- */
-  --bg:             #060607;
-  --bg-elevated:    #121214;
-  --bg-sunken:      #0a0a0c;
-  --surface:        rgba(255, 255, 255, 0.045);
-  --surface-hover:  rgba(255, 255, 255, 0.08);
+  --bg:             #0b0c0a;
+  --bg-elevated:    #141612;
+  --bg-sunken:      #080907;
+  --surface:        rgba(217, 221, 208, 0.045);
+  --surface-hover:  rgba(217, 221, 208, 0.085);
 
   /* Text — contrast ratios measured against --bg (WCAG 2.1) ---------------- */
-  --text:           #f5f5f7;  /* 18.6:1  AAA */
-  --text-secondary: #a1a1a6;  /*  7.87:1 AAA */
-  --text-tertiary:  #8a8a92;  /*  5.91:1 AA  */
+  --text:           #dcdfd2;  /* 14.2:1  AAA */
+  --text-secondary: #a2a89a;  /*  7.6:1  AAA */
+  --text-tertiary:  #8a9082;  /*  5.6:1  AA  */
 
   /* Accent ---------------------------------------------------------------- */
   /* --accent        fills, borders, rings, glows
      --accent-text   any accent-coloured TEXT (never use --accent for text)
      --accent-2      decorative only, never carries text                     */
-  --accent:         #2997ff;  /*  6.72:1 on --bg */
-  --accent-text:    #2997ff;
-  --accent-soft:    rgba(41, 151, 255, 0.14);
-  --accent-2:       #af52de;
+  --accent:         #8bf08a;  /* 13.0:1 on --bg — phosphor */
+  --accent-text:    #8bf08a;
+  --accent-soft:    rgba(139, 240, 138, 0.12);
+  --accent-2:       #ffb454;  /* amber, decorative only */
 
   /* Lines ----------------------------------------------------------------- */
-  --border:         rgba(255, 255, 255, 0.10);
-  --border-strong:  rgba(255, 255, 255, 0.20);
+  --border:         rgba(220, 223, 210, 0.16);
+  --border-strong:  rgba(220, 223, 210, 0.34);
 
   /* Liquid glass ---------------------------------------------------------- */
   /* Web approximation of a frosted material: backdrop blur + saturation,
      a translucent fill, and a 1px top highlight for edge refraction.
      This is not Apple's Liquid Glass; it is a CSS approximation of it.      */
-  --glass-bg:       rgba(18, 18, 20, 0.55);
-  --glass-bg-solid: rgba(14, 14, 16, 0.72);
-  --glass-border:   rgba(255, 255, 255, 0.12);
+  --glass-bg:       rgba(16, 18, 14, 0.62);
+  --glass-bg-solid: rgba(12, 14, 11, 0.80);
+  --glass-border:   rgba(220, 223, 210, 0.22);
   --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.45);
 
   /* Island ---------------------------------------------------------------- */
@@ -54,15 +54,15 @@
      half, a specular rim that pools light on the top-left and bottom-right
      edges, and a faint base ring so the edge never disappears. The --inv-
      twins are what the island wears over an inverse band (see home.css). */
-  --island-bg:          rgba(22, 22, 26, 0.62);
-  --island-sheen:       rgba(255, 255, 255, 0.10);
-  --island-rim:         rgba(255, 255, 255, 0.38);
-  --island-rim-soft:    rgba(255, 255, 255, 0.09);
+  --island-bg:          rgba(16, 18, 14, 0.70);
+  --island-sheen:       rgba(220, 223, 210, 0.08);
+  --island-rim:         rgba(220, 223, 210, 0.34);
+  --island-rim-soft:    rgba(220, 223, 210, 0.10);
   --island-shadow:      0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.24);
-  --inv-island-bg:        rgba(255, 255, 255, 0.72);
-  --inv-island-sheen:     rgba(255, 255, 255, 0.60);
-  --inv-island-rim:       rgba(255, 255, 255, 0.95);
-  --inv-island-rim-soft:  rgba(0, 0, 0, 0.08);
+  --inv-island-bg:        rgba(236, 235, 227, 0.78);
+  --inv-island-sheen:     rgba(255, 255, 255, 0.50);
+  --inv-island-rim:       rgba(255, 255, 255, 0.90);
+  --inv-island-rim-soft:  rgba(20, 22, 15, 0.14);
   --inv-island-shadow:    0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
 
   /* Danger ---------------------------------------------------------------- */
@@ -79,19 +79,19 @@
      so every component inside it (buttons, fields, cards, focus ring) flips
      with no per-component rule. In dark the inverse band is light paper.   */
   --inv-scheme:           light;
-  --inv-bg:               #f5f5f7;
-  --inv-bg-elevated:      #ffffff;
-  --inv-bg-sunken:        #ececf0;
-  --inv-surface:          rgba(0, 0, 0, 0.035);
-  --inv-surface-hover:    rgba(0, 0, 0, 0.06);
-  --inv-text:             #1d1d1f;
-  --inv-text-secondary:   #51515a;
-  --inv-text-tertiary:    #6e6e73;
-  --inv-accent:           #0071e3;
-  --inv-accent-text:      #0066cc;
-  --inv-accent-soft:      rgba(0, 113, 227, 0.10);
-  --inv-border:           rgba(0, 0, 0, 0.10);
-  --inv-border-strong:    rgba(0, 0, 0, 0.22);
+  --inv-bg:               #ecebe3;
+  --inv-bg-elevated:      #f6f5ee;
+  --inv-bg-sunken:        #e1e0d6;
+  --inv-surface:          rgba(20, 22, 15, 0.04);
+  --inv-surface-hover:    rgba(20, 22, 15, 0.07);
+  --inv-text:             #14160f;
+  --inv-text-secondary:   #474b3f;
+  --inv-text-tertiary:    #62675a;
+  --inv-accent:           #1f7a2e;
+  --inv-accent-text:      #1a6a28;
+  --inv-accent-soft:      rgba(31, 122, 46, 0.10);
+  --inv-border:           rgba(20, 22, 15, 0.16);
+  --inv-border-strong:    rgba(20, 22, 15, 0.38);
   --inv-danger:           #d70015;
   --inv-danger-text:      #d70015;
   --inv-danger-soft:      rgba(215, 0, 21, 0.08);
@@ -106,43 +106,43 @@
   color-scheme: light;
 
   /* Surfaces */
-  --bg:             #f5f5f7;
-  --bg-elevated:    #ffffff;
-  --bg-sunken:      #ececf0;
-  --surface:        rgba(255, 255, 255, 0.72);
-  --surface-hover:  rgba(255, 255, 255, 0.95);
+  --bg:             #ecebe3;
+  --bg-elevated:    #f6f5ee;
+  --bg-sunken:      #e1e0d6;
+  --surface:        rgba(246, 245, 238, 0.72);
+  --surface-hover:  rgba(246, 245, 238, 0.95);
 
   /* Text */
-  --text:           #1d1d1f;
-  --text-secondary: #51515a;
-  --text-tertiary:  #6e6e73;  /* 4.72:1 AA */
+  --text:           #14160f;
+  --text-secondary: #474b3f;
+  --text-tertiary:  #62675a;  /* 5.0:1 AA */
 
   /* Accent */
-  --accent:         #0071e3;  /* fills only */
-  --accent-text:    #0066cc;  /* 5.11:1 AA — all accent-coloured text */
-  --accent-soft:    rgba(0, 113, 227, 0.10);
-  --accent-2:       #9536c4;
+  --accent:         #1f7a2e;  /* fills only */
+  --accent-text:    #1a6a28;  /* 5.4:1 AA — all accent-coloured text */
+  --accent-soft:    rgba(31, 122, 46, 0.10);
+  --accent-2:       #b36b00;
 
   /* Lines */
-  --border:         rgba(0, 0, 0, 0.10);
-  --border-strong:  rgba(0, 0, 0, 0.20);
+  --border:         rgba(20, 22, 15, 0.16);
+  --border-strong:  rgba(20, 22, 15, 0.38);
 
   /* Liquid glass */
-  --glass-bg:       rgba(255, 255, 255, 0.55);
-  --glass-bg-solid: rgba(255, 255, 255, 0.78);
-  --glass-border:   rgba(255, 255, 255, 0.65);
-  --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.10);
+  --glass-bg:       rgba(246, 245, 238, 0.58);
+  --glass-bg-solid: rgba(246, 245, 238, 0.82);
+  --glass-border:   rgba(20, 22, 15, 0.20);
+  --glass-shadow:   0 8px 32px rgba(20, 22, 15, 0.10);
 
   /* Island */
-  --island-bg:          rgba(255, 255, 255, 0.72);
-  --island-sheen:       rgba(255, 255, 255, 0.60);
-  --island-rim:         rgba(255, 255, 255, 0.95);
-  --island-rim-soft:    rgba(0, 0, 0, 0.08);
+  --island-bg:          rgba(236, 235, 227, 0.78);
+  --island-sheen:       rgba(255, 255, 255, 0.50);
+  --island-rim:         rgba(255, 255, 255, 0.90);
+  --island-rim-soft:    rgba(20, 22, 15, 0.14);
   --island-shadow:      0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-  --inv-island-bg:        rgba(22, 22, 26, 0.62);
-  --inv-island-sheen:     rgba(255, 255, 255, 0.10);
-  --inv-island-rim:       rgba(255, 255, 255, 0.38);
-  --inv-island-rim-soft:  rgba(255, 255, 255, 0.09);
+  --inv-island-bg:        rgba(16, 18, 14, 0.70);
+  --inv-island-sheen:     rgba(220, 223, 210, 0.08);
+  --inv-island-rim:       rgba(220, 223, 210, 0.34);
+  --inv-island-rim-soft:  rgba(220, 223, 210, 0.10);
   --inv-island-shadow:    0 12px 32px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.24);
 
   /* Danger */
@@ -152,19 +152,19 @@
 
   /* Inverse band: in light the inverse band is the dark ink. */
   --inv-scheme:           dark;
-  --inv-bg:               #060607;
-  --inv-bg-elevated:      #121214;
-  --inv-bg-sunken:        #0a0a0c;
-  --inv-surface:          rgba(255, 255, 255, 0.045);
-  --inv-surface-hover:    rgba(255, 255, 255, 0.08);
-  --inv-text:             #f5f5f7;
-  --inv-text-secondary:   #a1a1a6;
-  --inv-text-tertiary:    #8a8a92;
-  --inv-accent:           #2997ff;
-  --inv-accent-text:      #2997ff;
-  --inv-accent-soft:      rgba(41, 151, 255, 0.14);
-  --inv-border:           rgba(255, 255, 255, 0.10);
-  --inv-border-strong:    rgba(255, 255, 255, 0.20);
+  --inv-bg:               #0b0c0a;
+  --inv-bg-elevated:      #141612;
+  --inv-bg-sunken:        #080907;
+  --inv-surface:          rgba(217, 221, 208, 0.045);
+  --inv-surface-hover:    rgba(217, 221, 208, 0.085);
+  --inv-text:             #dcdfd2;
+  --inv-text-secondary:   #a2a89a;
+  --inv-text-tertiary:    #8a9082;
+  --inv-accent:           #8bf08a;
+  --inv-accent-text:      #8bf08a;
+  --inv-accent-soft:      rgba(139, 240, 138, 0.12);
+  --inv-border:           rgba(220, 223, 210, 0.16);
+  --inv-border-strong:    rgba(220, 223, 210, 0.34);
   --inv-danger:           #ff453a;
   --inv-danger-text:      #ff6961;
   --inv-danger-soft:      rgba(255, 69, 58, 0.12);
@@ -180,7 +180,7 @@
   /* A theme-independent near-white. The home page's sliding project word is
      painted in it with mix-blend-mode: difference, so it inverts whatever
      photograph it crosses and stays legible in both themes.                 */
-  --paper: #f5f5f7;
+  --paper: #ecebe3;
 
   /* Space ----------------------------------------------------------------- */
   /* A geometric-ish scale. Never write a raw rem in a component rule.       */
@@ -209,22 +209,22 @@
   --fs-base:    1.0625rem;
   --fs-lg:      clamp(1.125rem, 1.6vw, 1.375rem);
   --fs-xl:      clamp(1.5rem,  2.4vw, 2rem);
-  --fs-2xl:     clamp(2rem,    4vw,   3rem);
-  --fs-3xl:     clamp(2.5rem,  6vw,   4.5rem);
-  --fs-display: clamp(3rem,    9vw,   7.5rem);
+  --fs-2xl:     clamp(1.75rem, 3.4vw, 2.5rem);
+  --fs-3xl:     clamp(2.125rem, 5vw, 3.75rem);
+  --fs-display: clamp(2.5rem,  7.5vw, 6.25rem);
 
   /* Poster scale (home page). Decorative words: the hero marquee, the
      sliding project word and the footer wordmark are aria-hidden or plain
      links, so they may run past the display cap. --fs-title is litup's
      2-line bold section title; --fs-kicker its stacked uppercase label.   */
   --fs-kicker:  0.75rem;
-  --fs-title:   clamp(1.75rem, 2.6vw, 2.5rem);
-  --fs-hero:    clamp(2.5rem,  5.6vw, 5.5rem);
-  --fs-roller:  clamp(3rem,    7vw,   6.5rem);
-  --fs-prose-xl: clamp(1.625rem, 3.4vw, 3.25rem);
-  --fs-mega:    clamp(4.5rem,  11vw,  10.5rem);
-  --fs-poster:  clamp(5.5rem,  13.5vw, 13rem);
-  --fs-wordmark: clamp(6rem,   24vw,  22rem);
+  --fs-title:   clamp(1.5rem,  2.3vw, 2.25rem);
+  --fs-hero:    clamp(2.125rem, 4.4vw, 4.25rem);
+  --fs-roller:  clamp(2.5rem,  6vw,   5.5rem);
+  --fs-prose-xl: clamp(1.375rem, 2.9vw, 2.75rem);
+  --fs-mega:    clamp(3.5rem,  9vw,   9rem);
+  --fs-poster:  clamp(5rem,    12vw,  11.5rem);
+  --fs-wordmark: clamp(4.5rem,  17vw,  17rem);
 
   /* Typefaces ------------------------------------------------------------- */
   /* Inter      — everything structural
@@ -232,11 +232,13 @@
      letterforms, so headings carry character without resorting to a serif.
                                and nothing else
      JetBrains Mono — eyebrows, metadata, tags, proof bar, keyboard hints    */
-  --font-sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Space Grotesk", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:  "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  /* Jost — the free geometric stand-in for Futura. Home page display only. */
-  --font-poster: "Jost", "Futura", "Futura PT", "Century Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:  "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* ASCII theme: the whole site is set in one monospace face. The sans,
+     display and poster slots are kept so no component rule has to change;
+     they now all resolve to --font-mono.                                   */
+  --font-sans:    var(--font-mono);
+  --font-display: var(--font-mono);
+  --font-poster:  var(--font-mono);
 
   /* Line heights ---------------------------------------------------------- */
   --lh-display: 1.02;
@@ -251,13 +253,13 @@
   --ls-mono:    0.08em;   /* uppercase mono runs */
 
   /* Radii ----------------------------------------------------------------- */
-  /* One shape system: surfaces step sm → xl by size, interactive pills are
-     fully rounded. Nothing else.                                            */
-  --r-sm:   10px;
-  --r-md:   16px;
-  --r-lg:   24px;
-  --r-xl:   32px;
-  --r-pill: 999px;
+  /* ASCII theme: every corner is square, like a box drawn in characters.
+     The scale is kept so components still reference a size by role.        */
+  --r-sm:   0;
+  --r-md:   0;
+  --r-lg:   0;
+  --r-xl:   0;
+  --r-pill: 0;
 
   /* Motion ---------------------------------------------------------------- */
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
@@ -305,8 +307,8 @@
     --text-secondary: #333333;
     --text-tertiary:  #555555;
 
-    --accent:         #0066cc;
-    --accent-text:    #0066cc;
+    --accent:         #1a6a28;
+    --accent-text:    #1a6a28;
     --accent-soft:    transparent;
 
     --border:         rgba(0, 0, 0, 0.25);
@@ -327,8 +329,8 @@
     --inv-text:           #000000;
     --inv-text-secondary: #333333;
     --inv-text-tertiary:  #555555;
-    --inv-accent:         #0066cc;
-    --inv-accent-text:    #0066cc;
+    --inv-accent:         #1a6a28;
+    --inv-accent-text:    #1a6a28;
     --inv-accent-soft:    transparent;
     --inv-border:         rgba(0, 0, 0, 0.25);
     --inv-border-strong:  rgba(0, 0, 0, 0.45);
